@@ -648,3 +648,123 @@ font-weight:600 !important;
 .footer-link:hover{
 color:#4ea3ff !important;
 }
+/* =====================================================
+   FOOTER PREMIUM - RATIO HYPERION
+===================================================== */
+
+.footer{
+    width:100%;
+    margin-top:90px;
+    background:linear-gradient(180deg,#071a34 0%,#0b2142 100%);
+    padding:0;
+    position:relative;
+    overflow:hidden;
+}
+
+/* Línea superior con los colores del ecosistema */
+
+.footer::before{
+    content:"";
+    display:block;
+    width:100%;
+    height:6px;
+    background:linear-gradient(
+        90deg,
+        #21d07a 0%,
+        #00b7ff 18%,
+        #ff8c00 36%,
+        #5b7cff 54%,
+        #ffc400 72%,
+        #aeb8c6 100%
+    );
+}
+
+.footer-content{
+    width:min(1180px,calc(100% - 40px));
+    margin:auto;
+    padding:70px 0 35px;
+    display:grid;
+    grid-template-columns:2fr 1fr 1fr;
+    gap:50px;
+    align-items:start;
+}
+
+.footer-logo{
+    text-align:center;
+    margin-top:-65px;
+    margin-bottom:25px;
+}
+
+.footer-logo img{
+    width:145px;
+    height:145px;
+    background:#fff;
+    border-radius:50%;
+    padding:8px;
+    box-shadow:0 20px 40px rgba(0,0,0,.35);
+}
+
+.footer h2{
+    color:#fff !important;
+    font-size:2rem;
+    margin-bottom:10px;
+}
+
+.footer p{
+    color:rgba(255,255,255,.80);
+    line-height:1.7;
+}
+
+.footer h4{
+    color:#fff;
+    margin-bottom:18px;
+}
+
+.footer ul{
+    list-style:none;
+    padding:0;
+    margin:0;
+}
+
+.footer li{
+    margin:14px 0;
+}
+
+.footer a{
+    color:#fff;
+    text-decoration:none;
+    transition:.25s;
+}
+
+.footer a:hover{
+    color:#3fa9ff;
+}
+
+.footer-copy{
+    border-top:1px solid rgba(255,255,255,.10);
+    padding:24px;
+    text-align:center;
+    color:rgba(255,255,255,.70);
+    background:#06182f;
+}
+
+/* Responsive */
+
+@media(max-width:900px){
+
+.footer-content{
+    grid-template-columns:1fr;
+    text-align:center;
+    gap:35px;
+}
+
+.footer{
+    padding-bottom:110px;
+}
+
+.footer-logo img{
+    width:120px;
+    height:120px;
+}
+
+}
