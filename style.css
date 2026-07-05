@@ -414,3 +414,26 @@ border-radius:20px;
 .hero-colors .n{background:#0c6ad8;}
 .hero-colors .e{background:#ffc107;}
 .hero-colors .f{background:#8c96a7;}
+/* Corrección tarjeta Ecosistema RH hero */
+
+.hero-rh{
+display:none;
+}
+
+.hero-rh-simple{
+text-align:center;
+}
+
+.hero-rh-simple strong{
+display:block;
+font-size:34px;
+letter-spacing:1px;
+color:#fff;
+}
+
+.hero-rh-simple span{
+display:block;
+font-size:18px;
+color:rgba(255,255,255,.85);
+margin-top:8px;
+}
