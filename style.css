@@ -276,3 +276,21 @@ background:#4b5563;
 .facilities{
     --accent:#9CA3AF;
 }
+.eco-icon svg{
+width:42px;
+height:42px;
+fill:none;
+stroke:#fff;
+stroke-width:3;
+stroke-linecap:round;
+stroke-linejoin:round;
+}
+
+.eco-icon{
+background:rgba(255,255,255,.16);
+border:1px solid rgba(255,255,255,.25);
+}
+
+.energy .eco-icon svg{
+stroke:#111;
+}
