@@ -1,60 +1,43 @@
-/* Ratio Hyperion */
+/* Ratio Hyperion - script.js */
 
 const header = document.querySelector(".site-header");
+const nav = document.querySelector(".nav-menu");
+const toggle = document.querySelector(".nav-toggle");
 
 window.addEventListener("scroll", () => {
-  if (window.scrollY > 20) {
-    header.classList.add("scrolled");
-  } else {
-    header.classList.remove("scrolled");
+  if (header) {
+    header.classList.toggle("scrolled", window.scrollY > 20);
   }
 });
 
-const nav = document.querySelector(".nav-menu");
-
-if (nav) {
-
-  const btn = document.createElement("button");
-
-  btn.className = "nav-toggle";
-  btn.innerHTML = "☰";
-
-  document.querySelector(".nav-container").insertBefore(btn, nav);
-
-  btn.addEventListener("click", () => {
-
+if (toggle && nav) {
+  toggle.addEventListener("click", () => {
     nav.classList.toggle("open");
-
-    if (nav.classList.contains("open")) {
-      btn.innerHTML = "✕";
-    } else {
-      btn.innerHTML = "☰";
-    }
-
+    toggle.innerHTML = nav.classList.contains("open") ? "✕" : "☰";
   });
 
+  document.querySelectorAll(".nav-menu a").forEach(link => {
+    link.addEventListener("click", () => {
+      nav.classList.remove("open");
+      toggle.innerHTML = "☰";
+    });
+  });
 }
 
-const elementos = document.querySelectorAll(
-".section,.service-card,.solution-card,.contact-card,.project-box"
+const revealItems = document.querySelectorAll(
+  ".section, .service-card, .contact-card"
 );
 
-elementos.forEach(el=>el.classList.add("reveal"));
+revealItems.forEach(item => item.classList.add("reveal"));
 
-const observer = new IntersectionObserver(entries=>{
-
-entries.forEach(entry=>{
-
-if(entry.isIntersecting){
-
-entry.target.classList.add("is-visible");
-
-}
-
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add("is-visible");
+    }
+  });
+}, {
+  threshold: 0.15
 });
 
-},{
-threshold:0.15
-});
-
-elementos.forEach(el=>observer.observe(el));
+revealItems.forEach(item => observer.observe(item));
