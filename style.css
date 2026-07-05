@@ -694,3 +694,38 @@ h2{
     }
 
 }
+/* Ajuste final header mobile */
+
+@media(max-width:700px){
+
+    .brand{
+        flex:1;
+        min-width:0;
+    }
+
+    .brand-text strong{
+        font-size:22px;
+        white-space:nowrap;
+    }
+
+    .brand-text span{
+        display:none;
+    }
+
+    .nav-container{
+        gap:12px;
+    }
+
+    .nav-toggle{
+        width:54px;
+        height:54px;
+        flex:0 0 54px;
+    }
+
+    .nav-button{
+        padding:10px 16px;
+        font-size:14px;
+        flex:0 0 auto;
+    }
+
+}
