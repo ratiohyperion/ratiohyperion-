@@ -1,1 +1,348 @@
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
 
+html{
+scroll-behavior:smooth;
+}
+
+body{
+font-family:Arial,Helvetica,sans-serif;
+background:#eef3f9;
+color:#20252d;
+line-height:1.6;
+}
+
+a{
+text-decoration:none;
+}
+
+.hero{
+background:linear-gradient(135deg,#022b5c,#0c6ad8);
+color:white;
+padding:30px;
+padding-bottom:90px;
+}
+
+.navbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+flex-wrap:wrap;
+margin-bottom:70px;
+}
+
+.brand{
+display:flex;
+align-items:center;
+gap:15px;
+}
+
+.brand-mark{
+width:55px;
+height:55px;
+background:white;
+color:#0c6ad8;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:22px;
+font-weight:bold;
+}
+
+.brand span{
+display:block;
+font-size:14px;
+opacity:.85;
+}
+
+.nav-cta{
+background:white;
+color:#0c6ad8;
+padding:12px 24px;
+border-radius:40px;
+font-weight:bold;
+}
+
+.hero-content{
+max-width:900px;
+margin:auto;
+text-align:center;
+}
+
+.eyebrow{
+text-transform:uppercase;
+letter-spacing:2px;
+font-size:13px;
+opacity:.9;
+margin-bottom:15px;
+}
+
+.hero h1{
+font-size:56px;
+line-height:1.1;
+margin-bottom:25px;
+}
+
+.hero-text{
+font-size:22px;
+opacity:.95;
+margin-bottom:35px;
+}
+
+.hero-actions{
+display:flex;
+justify-content:center;
+gap:20px;
+flex-wrap:wrap;
+}
+
+.btn{
+padding:16px 30px;
+border-radius:50px;
+font-weight:bold;
+transition:.3s;
+}
+
+.primary{
+background:#25D366;
+color:white;
+}
+
+.secondary{
+border:2px solid white;
+color:white;
+}
+
+.primary:hover,
+.secondary:hover{
+transform:translateY(-3px);
+}
+.section{
+max-width:1180px;
+margin:auto;
+padding:80px 24px;
+}
+
+.section-label{
+color:#0c6ad8;
+font-weight:bold;
+text-transform:uppercase;
+letter-spacing:1.5px;
+font-size:13px;
+margin-bottom:12px;
+}
+
+.section h2{
+font-size:38px;
+line-height:1.15;
+color:#071b3a;
+margin-bottom:24px;
+}
+
+.intro{
+display:grid;
+grid-template-columns:1fr 1.3fr;
+gap:50px;
+align-items:center;
+}
+
+.intro p:last-child{
+font-size:20px;
+color:#3d4654;
+}
+
+.grid{
+display:grid;
+gap:22px;
+margin-top:30px;
+}
+
+.cards-4{
+grid-template-columns:repeat(4,1fr);
+}
+
+.cards-3{
+grid-template-columns:repeat(3,1fr);
+}
+
+.card,
+.solution,
+.contact-card{
+background:white;
+border:1px solid #dce7f3;
+border-radius:22px;
+padding:28px;
+box-shadow:0 15px 35px rgba(4,32,72,.08);
+}
+
+.card h3,
+.solution h3{
+color:#0c6ad8;
+font-size:22px;
+margin-bottom:12px;
+}
+
+.card p,
+.solution p{
+color:#4b5563;
+}
+
+.dark{
+max-width:none;
+background:linear-gradient(135deg,#06152e,#0a376d);
+color:white;
+padding-left:calc((100% - 1180px)/2 + 24px);
+padding-right:calc((100% - 1180px)/2 + 24px);
+}
+
+.dark h2{
+color:white;
+}
+
+.dark .section-label{
+color:#7cc4ff;
+}
+
+.solution{
+background:rgba(255,255,255,.08);
+border:1px solid rgba(255,255,255,.18);
+backdrop-filter:blur(10px);
+}
+
+.solution h3{
+color:white;
+}
+
+.solution p{
+color:#dbeafe;
+}
+
+.sectors{
+grid-template-columns:repeat(4,1fr);
+}
+
+.sectors span{
+background:white;
+border:1px solid #dce7f3;
+border-radius:999px;
+padding:16px 20px;
+text-align:center;
+font-weight:bold;
+color:#071b3a;
+box-shadow:0 10px 25px rgba(4,32,72,.06);
+}
+
+.contact-section{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:40px;
+align-items:center;
+}
+
+.contact-card p{
+margin-bottom:12px;
+}
+
+.full{
+display:block;
+text-align:center;
+margin-top:22px;
+}
+
+footer{
+background:#06152e;
+color:white;
+text-align:center;
+padding:30px 20px;
+}
+
+.floating-whatsapp{
+position:fixed;
+right:18px;
+bottom:18px;
+background:#25D366;
+color:white;
+padding:15px 22px;
+border-radius:999px;
+font-weight:bold;
+box-shadow:0 12px 30px rgba(0,0,0,.25);
+z-index:20;
+}
+@media(max-width:1000px){
+.cards-4,
+.cards-3,
+.sectors{
+grid-template-columns:repeat(2,1fr);
+}
+
+.intro,
+.contact-section{
+grid-template-columns:1fr;
+}
+
+.hero h1{
+font-size:44px;
+}
+}
+
+@media(max-width:620px){
+.hero{
+padding:24px;
+padding-bottom:70px;
+}
+
+.navbar{
+margin-bottom:50px;
+}
+
+.brand{
+align-items:flex-start;
+}
+
+.brand-mark{
+width:48px;
+height:48px;
+font-size:18px;
+}
+
+.nav-cta{
+margin-top:18px;
+}
+
+.hero h1{
+font-size:36px;
+}
+
+.hero-text{
+font-size:18px;
+}
+
+.section{
+padding:60px 20px;
+}
+
+.section h2{
+font-size:30px;
+}
+
+.cards-4,
+.cards-3,
+.sectors{
+grid-template-columns:1fr;
+}
+
+.btn{
+width:100%;
+text-align:center;
+}
+
+.floating-whatsapp{
+left:18px;
+right:18px;
+text-align:center;
+}
+}
