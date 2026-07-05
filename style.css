@@ -944,3 +944,79 @@ color:#4ea3ff !important;
     text-align:center !important;
   }
 }
+/* ===== FOOTER FINAL VISIBLE + LOGO SIN PISAR TARJETA ===== */
+
+.footer{
+  width:min(1180px, calc(100% - 48px)) !important;
+  margin:230px auto 120px !important;
+  padding:95px 0 0 !important;
+  background:#081c38 !important;
+  color:#ffffff !important;
+  position:relative !important;
+  display:block !important;
+  overflow:visible !important;
+  opacity:1 !important;
+}
+
+.footer-logo{
+  position:absolute !important;
+  top:-70px !important;
+  left:50% !important;
+  transform:translateX(-50%) !important;
+  width:130px !important;
+  height:130px !important;
+  background:#fff !important;
+  border-radius:50% !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  box-shadow:0 18px 40px rgba(0,0,0,.28) !important;
+  overflow:hidden !important;
+  z-index:2 !important;
+}
+
+.footer-logo img{
+  width:88px !important;
+  height:auto !important;
+}
+
+.footer-content{
+  background:#081c38 !important;
+  color:#ffffff !important;
+  padding:0 48px 45px !important;
+  display:grid !important;
+  grid-template-columns:1.2fr 1fr 1fr !important;
+  gap:55px !important;
+}
+
+.footer h2,
+.footer h4,
+.footer p,
+.footer li,
+.footer a{
+  color:#ffffff !important;
+  opacity:1 !important;
+}
+
+.footer-copy{
+  background:#081c38 !important;
+  color:#ffffff !important;
+  margin:0 !important;
+  padding:26px 20px !important;
+  border-top:1px solid rgba(255,255,255,.14) !important;
+}
+
+@media(max-width:800px){
+  .footer{
+    width:calc(100% - 56px) !important;
+    margin:220px auto 120px !important;
+    padding-top:90px !important;
+  }
+
+  .footer-content{
+    grid-template-columns:1fr !important;
+    text-align:center !important;
+    padding:0 28px 40px !important;
+    gap:36px !important;
+  }
+}
