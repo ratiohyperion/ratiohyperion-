@@ -145,3 +145,43 @@ font-size:24px;
 grid-template-columns:1fr;
 }
 }
+/* Mejora contraste Ecosistema RH */
+
+.eco-card{
+background:#0b4fa3;
+color:#fff;
+}
+
+.eco-card h3{
+color:#fff;
+font-weight:800;
+}
+
+.eco-card p{
+color:rgba(255,255,255,.92);
+font-weight:500;
+}
+
+.eco-card small{
+color:#fff;
+background:rgba(0,0,0,.22);
+}
+
+.energy{
+background:#f5b700;
+color:#111;
+}
+
+.energy h3,
+.energy p,
+.energy small{
+color:#111;
+}
+
+.energy small{
+background:rgba(255,255,255,.35);
+}
+
+.facilities{
+background:#4b5563;
+}
