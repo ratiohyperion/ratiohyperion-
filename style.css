@@ -829,3 +829,21 @@ color:#4ea3ff !important;
     text-align: center;
     color: #fff;
 }
+/* ===== UNIR FOOTER Y COPYRIGHT ===== */
+
+.footer{
+    margin-top: 140px !important;
+    padding-top: 90px !important;
+    padding-bottom: 0 !important;
+}
+
+.footer-copy{
+    margin-top: 0 !important;
+    padding: 28px 20px !important;
+    background: #081c38 !important;
+    border-top: 1px solid rgba(255,255,255,.12);
+}
+
+.footer-content{
+    padding-bottom: 0 !important;
+}
