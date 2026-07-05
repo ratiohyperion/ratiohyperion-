@@ -847,3 +847,100 @@ color:#4ea3ff !important;
 .footer-content{
     padding-bottom: 0 !important;
 }
+/* ===== FIX FINAL FOOTER PC + MOBILE ===== */
+
+.footer{
+  width:min(1180px, calc(100% - 48px)) !important;
+  margin:150px auto 120px !important;
+  padding:110px 0 0 !important;
+  background:#081c38 !important;
+  color:#fff !important;
+  position:relative !important;
+  display:block !important;
+  overflow:visible !important;
+}
+
+.footer-content{
+  width:100% !important;
+  margin:0 auto !important;
+  padding:0 48px 45px !important;
+  display:grid !important;
+  grid-template-columns:1.2fr 1fr 1fr !important;
+  gap:55px !important;
+  align-items:start !important;
+  background:transparent !important;
+}
+
+.footer-brand{
+  text-align:left !important;
+}
+
+.footer-logo{
+  position:absolute !important;
+  top:-75px !important;
+  left:50% !important;
+  transform:translateX(-50%) !important;
+  width:140px !important;
+  height:140px !important;
+  background:#fff !important;
+  border-radius:50% !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  box-shadow:0 18px 40px rgba(0,0,0,.28) !important;
+  overflow:hidden !important;
+  z-index:2 !important;
+}
+
+.footer-logo img{
+  width:95px !important;
+  height:auto !important;
+}
+
+.footer h2,
+.footer h4,
+.footer p,
+.footer li,
+.footer a{
+  color:#fff !important;
+  opacity:1 !important;
+}
+
+.footer ul{
+  list-style:none !important;
+  padding:0 !important;
+  margin:0 !important;
+}
+
+.footer li{
+  margin:10px 0 !important;
+}
+
+.footer-copy{
+  width:100% !important;
+  margin:0 !important;
+  padding:26px 20px !important;
+  background:#081c38 !important;
+  border-top:1px solid rgba(255,255,255,.14) !important;
+  color:rgba(255,255,255,.85) !important;
+  text-align:center !important;
+  display:block !important;
+}
+
+@media(max-width:800px){
+  .footer{
+    width:calc(100% - 56px) !important;
+    margin:150px auto 120px !important;
+  }
+
+  .footer-content{
+    grid-template-columns:1fr !important;
+    text-align:center !important;
+    padding:110px 28px 40px !important;
+    gap:36px !important;
+  }
+
+  .footer-brand{
+    text-align:center !important;
+  }
+}
