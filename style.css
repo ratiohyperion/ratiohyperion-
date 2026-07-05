@@ -103,13 +103,13 @@ a{
 
 .brand-text strong{
   display:block;
-  font-size:18px;
+  font-size:22px;
   letter-spacing:.2px;
 }
 
 .brand-text span{
   display:block;
-  font-size:12px;
+  font-size:13px;
   opacity:.82;
   margin-top:1px;
 }
@@ -569,9 +569,8 @@ h2{
   }
 
   .brand-logo{
-    width:48px;
-    height:48px;
-    font-size:19px;
+    width:72px;
+    height:72px;
   }
 
   .brand-text strong{
