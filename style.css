@@ -364,3 +364,53 @@ font-size:17px;
 grid-template-columns:1fr;
 }
 }
+.hero-rh{
+text-align:center;
+}
+
+.hero-rh-logo{
+width:82px;
+height:82px;
+margin:0 auto 16px;
+border-radius:50%;
+background:#fff;
+color:#0c6ad8;
+font-size:36px;
+font-weight:800;
+display:flex;
+align-items:center;
+justify-content:center;
+box-shadow:0 12px 30px rgba(0,0,0,.15);
+}
+
+.hero-rh strong{
+display:block;
+font-size:28px;
+letter-spacing:1px;
+margin-bottom:10px;
+}
+
+.hero-rh span{
+font-size:18px;
+opacity:.9;
+}
+
+.hero-colors{
+display:flex;
+justify-content:center;
+gap:8px;
+margin-top:18px;
+}
+
+.hero-colors span{
+width:22px;
+height:6px;
+border-radius:20px;
+}
+
+.hero-colors .g{background:#27d366;}
+.hero-colors .v{background:#1e88ff;}
+.hero-colors .c{background:#ff8c00;}
+.hero-colors .n{background:#0c6ad8;}
+.hero-colors .e{background:#ffc107;}
+.hero-colors .f{background:#8c96a7;}
