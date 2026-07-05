@@ -77,13 +77,14 @@ a{
 .brand{
   display:flex;
   align-items:center;
-  gap:14px;
+  gap:10px;
   color:white;
+  align-items:center;
 }
 
 .brand-logo{
-    width:110px;
-    height:110px;
+    width:84px;
+    height:84px;
     display:flex;
     align-items:center;
     justify-content:center;
