@@ -607,3 +607,44 @@ color:#4ea3ff !important;
 .footer-copy{
 color:rgba(255,255,255,.75) !important;
 }
+/* FIX FINAL FOOTER */
+
+footer,
+.footer,
+.footer-content,
+.footer-copy{
+background:#06182f !important;
+color:#ffffff !important;
+}
+
+.footer{
+padding:70px 20px 120px !important;
+}
+
+.footer *{
+color:#ffffff !important;
+}
+
+.footer ul,
+footer ul{
+list-style:none !important;
+padding:0 !important;
+margin:0 !important;
+}
+
+.footer li,
+footer li{
+margin-bottom:14px !important;
+}
+
+.footer a,
+.footer-link{
+color:#ffffff !important;
+text-decoration:none !important;
+font-weight:600 !important;
+}
+
+.footer a:hover,
+.footer-link:hover{
+color:#4ea3ff !important;
+}
