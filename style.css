@@ -580,3 +580,30 @@ text-decoration:none;
 .footer-link:hover{
 color:#4ea3ff;
 }
+/* Corrección footer claro */
+
+.footer{
+background:#06182f !important;
+color:#ffffff !important;
+}
+
+.footer h3,
+.footer h4,
+.footer p,
+.footer li{
+color:#ffffff !important;
+}
+
+.footer-link{
+color:#ffffff !important;
+text-decoration:none;
+font-weight:600;
+}
+
+.footer-link:hover{
+color:#4ea3ff !important;
+}
+
+.footer-copy{
+color:rgba(255,255,255,.75) !important;
+}
