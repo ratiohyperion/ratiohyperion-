@@ -82,13 +82,23 @@ a{
 }
 
 .brand-logo{
-    width:60px;
-    height:60px;
-    object-fit:contain;
-    border-radius:50%;
+    width:80px;
+    height:80px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
     background:#fff;
-    padding:6px;
-    box-shadow:0 8px 20px rgba(0,0,0,.15);
+    border-radius:50%;
+    padding:4px;
+    overflow:hidden;
+    box-shadow:0 8px 20px rgba(0,0,0,.18);
+}
+
+.brand-logo img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    display:block;
 }
 
 .brand-text strong{
