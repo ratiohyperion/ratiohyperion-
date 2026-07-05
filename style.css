@@ -776,3 +776,28 @@ h2{
   }
 
 }
+/* Ajuste botón WhatsApp mobile */
+
+@media(max-width:700px){
+
+  body{
+    padding-bottom:90px;
+  }
+
+  .floating-whatsapp{
+    bottom:18px;
+    left:24px;
+    right:24px;
+    width:auto;
+    max-width:none;
+  }
+
+  .project-box{
+    padding-bottom:95px;
+  }
+
+  .contact-card{
+    padding-bottom:95px;
+  }
+
+}
