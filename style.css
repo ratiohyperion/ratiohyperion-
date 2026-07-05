@@ -551,3 +551,18 @@ flex-direction:column;
 }
 
 }
+.footer ul{
+    list-style:none;
+    padding:0;
+    margin:0;
+}
+
+.footer-link{
+    color:rgba(255,255,255,.85);
+    text-decoration:none;
+    transition:.2s;
+}
+
+.footer-link:hover{
+    color:#4ea3ff;
+}
