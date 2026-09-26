@@ -54,3 +54,15 @@ lightbox?.addEventListener("click", (e) => {
     lightbox.classList.remove("open");
   }
 });
+
+/* Ocultar el botón flotante de WhatsApp al llegar al footer (que ya tiene su propio contacto) */
+const floatingWA = document.querySelector(".floating-whatsapp");
+const siteFooter = document.querySelector(".footer");
+if (floatingWA && siteFooter) {
+  const footerObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      floatingWA.classList.toggle("is-hidden", entry.isIntersecting);
+    });
+  }, { threshold: 0.05 });
+  footerObserver.observe(siteFooter);
+}

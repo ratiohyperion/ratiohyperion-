@@ -190,7 +190,8 @@ h2{font-size:clamp(30px,4vw,44px);line-height:1.15;margin-bottom:20px;color:var(
 .footer-credit{padding:0 20px 24px;text-align:center;font-size:11px;color:rgba(255,255,255,.45)}
 .footer-credit a{color:rgba(255,255,255,.6);text-decoration:underline}
 
-.floating-whatsapp{position:fixed;left:18px;right:18px;bottom:18px;background:var(--green);color:white;padding:14px 22px;border-radius:999px;font-weight:bold;box-shadow:0 10px 25px rgba(0,0,0,.25);text-align:center;z-index:999}
+.floating-whatsapp{position:fixed;left:18px;right:18px;bottom:18px;background:var(--green);color:white;padding:14px 22px;border-radius:999px;font-weight:bold;box-shadow:0 10px 25px rgba(0,0,0,.25);text-align:center;z-index:999;transition:opacity .25s,transform .25s}
+.floating-whatsapp.is-hidden{opacity:0;transform:translateY(20px);pointer-events:none}
 .reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease, transform .6s ease}
 .reveal.is-visible{opacity:1;transform:none}
 
