@@ -55,6 +55,16 @@ lightbox?.addEventListener("click", (e) => {
   }
 });
 
+/* Ecosistema y capacidades: tarjetas expandibles con el detalle de cada solución/servicio */
+document.querySelectorAll(".eco-card,.service-card").forEach(card => {
+  const toggle = card.querySelector(".eco-toggle");
+  if (!toggle) return;
+  card.addEventListener("click", (e) => {
+    if (e.target.closest("a")) return;
+    card.classList.toggle("is-open");
+  });
+});
+
 /* Ocultar el botón flotante de WhatsApp al llegar al footer (que ya tiene su propio contacto) */
 const floatingWA = document.querySelector(".floating-whatsapp");
 const siteFooter = document.querySelector(".footer");
