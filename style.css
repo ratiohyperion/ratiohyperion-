@@ -139,7 +139,7 @@ h2{font-size:clamp(30px,4vw,44px);line-height:1.15;margin-bottom:20px;color:var(
 .service-card .eco-details ul{border-top:1px solid rgba(12,106,216,.15)}
 .service-card .eco-details ul li{color:var(--muted)}
 .service-card .eco-details ul li::before{color:var(--blue2)}
-.guardian{--accent:#2AD66E}.vision{--accent:#2A8CFF}.control{--accent:#FF9D00}.net{--accent:#8B6BFF}.energy{--accent:#FFC93C}.facilities{--accent:#FF6B6B}.cloud{--accent:#00C2CC}
+.guardian{--accent:#2AD66E}.vision{--accent:#2A8CFF}.control{--accent:#FF9D00}.net{--accent:#8B6BFF}.energy{--accent:#FFC93C}.facilities{--accent:#FF6B6B}.cloud{--accent:#00C2CC}.web{--accent:#FF3D81}
 
 /* ===== GALERÍA DE OBRAS ===== */
 .gallery-section{background:white}
