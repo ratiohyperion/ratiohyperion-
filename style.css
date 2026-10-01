@@ -308,3 +308,6 @@ body{background:linear-gradient(180deg,#e9f2fd 0%,#d9e8fa 45%,#c7ddf6 100%) fixe
 .gr-list{list-style:none;padding:0;margin:0 0 16px;display:grid;gap:6px;font-size:14px;color:var(--navy)}
 .gr-cart{position:sticky;top:96px}
 @media(max-width:1000px){.gr-grid{grid-template-columns:1fr}.gr-cart{position:static}}
+.steps.four{grid-template-columns:repeat(4,1fr)}
+@media(max-width:1000px){.steps.four{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){.steps.four{grid-template-columns:1fr}}
