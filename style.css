@@ -311,3 +311,4 @@ body{background:linear-gradient(180deg,#e9f2fd 0%,#d9e8fa 45%,#c7ddf6 100%) fixe
 .steps.four{grid-template-columns:repeat(4,1fr)}
 @media(max-width:1000px){.steps.four{grid-template-columns:1fr 1fr}}
 @media(max-width:640px){.steps.four{grid-template-columns:1fr}}
+.fly:has(img[src*="render"]){grid-template-columns:1.1fr .9fr}
