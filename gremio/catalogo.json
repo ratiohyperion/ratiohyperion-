@@ -1,0 +1,42 @@
+[
+  {
+    "cat": "Cámaras",
+    "items": [
+      {
+        "id": "ej-cam-1",
+        "nombre": "Cámara IP domo 4 MP (ejemplo)",
+        "detalle": "Producto de ejemplo, reemplazar por el catálogo real"
+      },
+      {
+        "id": "ej-cam-2",
+        "nombre": "Cámara bala 2 MP (ejemplo)",
+        "detalle": "Producto de ejemplo, reemplazar por el catálogo real"
+      }
+    ]
+  },
+  {
+    "cat": "Grabadores",
+    "items": [
+      {
+        "id": "ej-nvr-1",
+        "nombre": "NVR 8 canales (ejemplo)",
+        "detalle": "Producto de ejemplo, reemplazar por el catálogo real"
+      }
+    ]
+  },
+  {
+    "cat": "Redes y accesorios",
+    "items": [
+      {
+        "id": "ej-sw-1",
+        "nombre": "Switch PoE 8 puertos (ejemplo)",
+        "detalle": "Producto de ejemplo, reemplazar por el catálogo real"
+      },
+      {
+        "id": "ej-cab-1",
+        "nombre": "Bobina UTP Cat 6 305 m (ejemplo)",
+        "detalle": "Producto de ejemplo, reemplazar por el catálogo real"
+      }
+    ]
+  }
+]

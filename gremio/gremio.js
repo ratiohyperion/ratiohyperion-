@@ -1,0 +1,15 @@
+(function(){
+var W='5491160121797',cart={},cats=[],cur=0;
+function $(i){return document.getElementById(i)}
+function render(){var t=$('gtabs'),it=$('gitems');t.innerHTML='';cats.forEach(function(c,i){var b=document.createElement('button');b.textContent=c.cat;b.className=i===cur?'on':'';b.onclick=function(){cur=i;render()};t.appendChild(b)});
+it.innerHTML='';(cats[cur]?cats[cur].items:[]).forEach(function(p){var d=document.createElement('div');d.className='gr-it';d.innerHTML='<div><b></b><small></small></div><div class="gr-q"><button aria-label="Menos">−</button><span></span><button aria-label="Más">+</button></div>';d.querySelector('b').textContent=p.nombre;d.querySelector('small').textContent=p.detalle||'';var q=d.querySelector('span');q.textContent=cart[p.id]?cart[p.id].q:0;var bs=d.querySelectorAll('button');bs[0].onclick=function(){set(p,-1)};bs[1].onclick=function(){set(p,1)};it.appendChild(d)});
+var ul=$('gcart'),ks=Object.keys(cart);ul.innerHTML='';if(!ks.length)ul.innerHTML='<li class="empty">Todavía no agregaste productos.</li>';ks.forEach(function(k){var li=document.createElement('li');li.textContent=cart[k].q+' × '+cart[k].nombre;ul.appendChild(li)})}
+function set(p,n){var c=cart[p.id]||{nombre:p.nombre,q:0};c.q=Math.max(0,c.q+n);if(c.q)cart[p.id]=c;else delete cart[p.id];render()}
+function txt(){var g=function(i){return $(i).value.trim()};return 'Pedido de gremio\nNombre: '+g('g1')+(g('g2')?'\nEmpresa: '+g('g2'):'')+'\nCUIT: '+g('g3')+'\nWhatsApp: '+g('g4')+'\n\nProductos:\n'+Object.keys(cart).map(function(k){return '• '+cart[k].q+' × '+cart[k].nombre}).join('\n')+(g('g5')?'\n\nComentarios: '+g('g5'):'')}
+function ok(){var bad=[];['g1','g3','g4'].forEach(function(i){var e=$(i),b=!e.value.trim();e.classList.toggle('err',b);if(b)bad.push(i)});var m='';if(!Object.keys(cart).length)m='Agregá al menos un producto. ';if(bad.length)m+='Completá nombre, CUIT y WhatsApp.';$('gmsg').textContent=m;return !m}
+$('gwa').onclick=function(){if(ok())window.open('https://wa.me/'+W+'?text='+encodeURIComponent(txt()),'_blank')};
+$('gmail').onclick=function(){if(ok())location.href='mailto:gremio@ratiohyperion.com.ar?subject='+encodeURIComponent('Pedido de gremio')+'&body='+encodeURIComponent(txt())};
+$('awa').onclick=function(){var g=function(i){return $(i).value.trim()},bad=false;['a1','a3','a4'].forEach(function(i){var e=$(i),b=!g(i);e.classList.toggle('err',b);if(b)bad=true});$('amsg').textContent=bad?'Completá nombre, CUIT y WhatsApp.':'';if(bad)return;window.open('https://wa.me/'+W+'?text='+encodeURIComponent('Hola, soy '+g('a1')+(g('a2')?' ('+g('a2')+')':'')+'. CUIT '+g('a3')+'. Quiero solicitar acceso a la lista de precios del gremio. Mi WhatsApp: '+g('a4')),'_blank')};
+document.addEventListener('input',function(e){if(e.target.classList.contains('err')&&e.target.value.trim())e.target.classList.remove('err')});
+fetch('/gremio/catalogo.json').then(function(r){return r.json()}).then(function(d){cats=d;render()}).catch(function(){$('gitems').innerHTML='<p class="empty">No pudimos cargar el catálogo. Escribinos por WhatsApp.</p>'});
+})();

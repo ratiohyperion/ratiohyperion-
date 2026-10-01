@@ -30,7 +30,9 @@ document.addEventListener('click',function(e){
  if(e.target.closest('#burger')){var n=document.getElementById('nav')||document.querySelector('.nav');n.classList.toggle('open')}
 });
 document.addEventListener('keydown',function(e){if(e.key==='Escape')$('drawer').classList.remove('open')});
-var f=$('cform');if(f)f.addEventListener('submit',function(e){e.preventDefault();$('fok').hidden=false});
+var f=$('cform');if(f){var DEST={'Tecnología':'proyectos','Infraestructura':'proyectos','Servicios Profesionales':'servicios','Consorcios':'consorcios','Gremio / instaladores':'gremio'};function ft(){var g=function(i){return $(i).value.trim()};return 'Hola, soy '+g('f1')+'.\nContacto: '+g('f2')+'\nUnidad de interés: '+$('f3').value+'\n\n'+g('f4')}
+f.addEventListener('submit',function(e){e.preventDefault();var d=(DEST[$('f3').value]||'contacto')+'@ratiohyperion.com.ar';$('fok').hidden=false;$('fok').textContent='Se abrió tu programa de correo con la consulta lista para enviar a '+d+'.';location.href='mailto:'+d+'?subject='+encodeURIComponent('Consulta desde la web')+'&body='+encodeURIComponent(ft())});
+$('cfwa').addEventListener('click',function(){if(!f.reportValidity())return;window.open('https://wa.me/'+W+'?text='+encodeURIComponent(ft()),'_blank')})}
 document.addEventListener('input',function(e){if(e.target.classList.contains('err')&&e.target.value.trim())e.target.classList.remove('err')});
 render();
 })();
