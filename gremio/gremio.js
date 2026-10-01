@@ -11,5 +11,5 @@ $('gwa').onclick=function(){if(ok())window.open('https://wa.me/'+W+'?text='+enco
 $('gmail').onclick=function(){if(ok())location.href='mailto:gremio@ratiohyperion.com.ar?subject='+encodeURIComponent('Pedido de gremio')+'&body='+encodeURIComponent(txt())};
 $('awa').onclick=function(){var g=function(i){return $(i).value.trim()},bad=false;['a1','a3','a4'].forEach(function(i){var e=$(i),b=!g(i);e.classList.toggle('err',b);if(b)bad=true});$('amsg').textContent=bad?'Completá nombre, CUIT y WhatsApp.':'';if(bad)return;window.open('https://wa.me/'+W+'?text='+encodeURIComponent('Hola, soy '+g('a1')+(g('a2')?' ('+g('a2')+')':'')+'. CUIT '+g('a3')+'. Quiero solicitar acceso a la lista de precios del gremio. Mi WhatsApp: '+g('a4')),'_blank')};
 document.addEventListener('input',function(e){if(e.target.classList.contains('err')&&e.target.value.trim())e.target.classList.remove('err')});
-fetch('/gremio/catalogo.json').then(function(r){return r.json()}).then(function(d){cats=d;render()}).catch(function(){$('gitems').innerHTML='<p class="empty">No pudimos cargar el catálogo. Escribinos por WhatsApp.</p>'});
+fetch('/catalogo.json').then(function(r){return r.json()}).then(function(d){cats=d;render()}).catch(function(){$('gitems').innerHTML='<p class="empty">No pudimos cargar el catálogo. Escribinos por WhatsApp.</p>'});
 })();
