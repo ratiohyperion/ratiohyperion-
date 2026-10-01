@@ -34,3 +34,6 @@
 .gr-send .dr-msg{margin:0 0 8px}
 @media(max-width:900px){.gr-send{position:static;border:0;padding:0}}
 .gr-cart{padding-bottom:0}.gr-send{padding-bottom:18px}
+.gr-ship{display:flex;gap:14px;align-items:center;background:#fff;border:1px solid #b9d0ee;border-radius:14px;padding:14px 18px;margin:0 0 18px;font-size:15px;line-height:1.45}
+.gr-ship svg{width:34px;height:34px;flex:none;fill:none;stroke:var(--blue);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.gr-ship span{color:var(--muted);font-size:14px}
