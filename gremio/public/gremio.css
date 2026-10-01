@@ -26,3 +26,11 @@
 .gr-filters input:focus,.gr-filters select:focus,.gr-auth input:focus{outline:2px solid var(--blue);outline-offset:1px}
 .gr-auth .f>div{display:block}
 .gr-upd{font-size:14px;color:var(--muted);margin:0 0 14px}.gr-upd a{color:var(--blue);font-weight:700}
+.gr-cart{position:sticky;top:96px;align-self:start;max-height:calc(100vh - 116px);overflow-y:auto;overscroll-behavior:contain}
+.gr-cart .gr-list{max-height:200px;overflow-y:auto}
+.gr-cart .dr-form{gap:10px}.gr-cart .dr-form textarea{min-height:60px}
+@media(max-width:900px){.gr-cart{position:static;max-height:none;overflow:visible}.gr-cart .gr-list{max-height:none}}
+.gr-send{position:sticky;bottom:-1px;background:#fff;padding:10px 0 4px;margin-top:8px;border-top:1px solid #dbe6f5;z-index:2}
+.gr-send .dr-msg{margin:0 0 8px}
+@media(max-width:900px){.gr-send{position:static;border:0;padding:0}}
+.gr-cart{padding-bottom:0}.gr-send{padding-bottom:18px}
