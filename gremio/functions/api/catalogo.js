@@ -3,6 +3,18 @@
 const SHEET_ID = '16pnoHtlqJZe-z3TKIid5_30AWFDBLbU5cs_kswoKt90';
 const TABS = ['Hikvision Cctv-IP', 'Hik Alarma/Portero/Acceso', 'DAHUA', 'EZVIZ', 'IMOU', 'Tp-Link', 'Intelbras', 'Accesorios / Varios', 'Commax', 'Celulares', 'Liq/Outlet'];
 let memo = { t: 0, d: null };
+const TAB_MARCA = { 'Hikvision Cctv-IP': 'Hikvision', 'Hik Alarma/Portero/Acceso': 'Hikvision', DAHUA: 'Dahua', EZVIZ: 'Ezviz', IMOU: 'Imou', 'Tp-Link': 'TP-Link', Intelbras: 'Intelbras', Commax: 'Commax' };
+const MARCAS = ['HIKVISION', 'HILOOK', 'DAHUA', 'UNIVIEW', 'ANVIZ', 'IMODO', 'FICATTO', 'SINOVISION', 'FURUKAWA', 'NETQUALITY', 'GLC', 'COMMSCOPE', 'FULLVISION', 'EZVIZ', 'IMOU', 'TP-LINK', 'TAPO', 'MERCUSYS', 'REYEE', 'INTELBRAS', 'COMMAX', 'SAMSUNG', 'XIAOMI', 'MOTOROLA', 'KINGSTON', 'SEAGATE', 'WESTERN DIGITAL', 'LENOVO', 'APPLE'];
+const bonita = (m) => (m === 'TP-LINK' ? 'TP-Link' : m.charAt(0) + m.slice(1).toLowerCase());
+function marca(cat, g, c, d) {
+  const t = (c + ' ' + d).toUpperCase();
+  if (cat === 'Celulares') { const x = g.toUpperCase(); if (x === 'IPHONE') return 'Apple'; if (['XIAOMI', 'MOTOROLA', 'SAMSUNG'].includes(x)) return bonita(x); return MARCAS.find((m) => t.includes(m)) ? bonita(MARCAS.find((m) => t.includes(m))) : ''; }
+  if (cat === 'Hikvision Cctv-IP') return /^(B\d|T\d|IPC-|NVR-|DVR-|\d+Q-)/i.test(c) ? 'Hilook' : 'Hikvision';
+  if (cat === 'Tp-Link') { const m = ['REYEE', 'MERCUSYS', 'TAPO'].find((x) => t.includes(x)); return m ? bonita(m) : 'TP-Link'; }
+  if (TAB_MARCA[cat]) return TAB_MARCA[cat];
+  const f = MARCAS.find((m) => t.includes(m));
+  return f ? bonita(f) : '';
+}
 
 function csv(b) {
   const rows = []; let r = [], f = '', q = false;
@@ -31,7 +43,7 @@ function parse(cat, rows, meta) {
     if (!b && p === null && !e) { if (a.length < 60 && !/^Precios sin IVA/i.test(a)) g = a.replace(/!+/g, '').trim(); return; }
     if (!b) return;
     const sin = /SIN STOCK/i.test(e), cons = /CONSULTAR/i.test(e);
-    out.push({ cat, g, c: a, d: b, p: p && !sin ? p : null, e: sin ? 'sin_stock' : (cons || !p) ? 'consultar' : '' });
+    out.push({ cat, g, m: marca(cat, g, a, b), c: a, d: b, p: p && !sin ? p : null, e: sin ? 'sin_stock' : (cons || !p) ? 'consultar' : '' });
   });
   return out;
 }
