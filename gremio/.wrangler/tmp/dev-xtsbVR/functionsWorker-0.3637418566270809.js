@@ -84,172 +84,120 @@ globalThis.fetch = new Proxy(globalThis.fetch, {
     ]);
   }
 });
-var mk = /* @__PURE__ */ __name2((cat, g, c, d, costo, e = "") => ({ cat, g, c, d, costo, e }), "mk");
-var DEMO = {
-  minimo: 25e4,
-  actualizado: "2026-10-01T12:00:00Z",
-  perfiles: {
-    gremio: { etiqueta: "Gremio", markup: 0.4 },
-    integrador: { etiqueta: "Integrador", markup: 0.3 },
-    distribuidor: { etiqueta: "Distribuidor / Proyecto", markup: 0.2 }
-  },
-  usuarios: [
-    { email: "gremio@demo.com", codigo: "demo", perfil: "gremio", nombre: "Cliente Gremio (demo)" },
-    { email: "integrador@demo.com", codigo: "demo", perfil: "integrador", nombre: "Cliente Integrador (demo)" },
-    { email: "distribuidor@demo.com", codigo: "demo", perfil: "distribuidor", nombre: "Cliente Distribuidor (demo)" }
-  ],
-  items: [
-    mk("C\xE1maras IP", "Bullet", "DEMO-B2", "C\xE1mara IP bullet 2MP | Exterior | IR 30M | PoE | Lente 2.8mm", 5e4),
-    mk("C\xE1maras IP", "Bullet", "DEMO-B4", "C\xE1mara IP bullet 4MP | Exterior | IR 30M | PoE | Micr\xF3fono", 78e3),
-    mk("C\xE1maras IP", "Domo", "DEMO-D2", "C\xE1mara IP domo 2MP | Interior/Exterior | IR 30M | PoE", 52e3),
-    mk("C\xE1maras IP", "Domo", "DEMO-D4", "C\xE1mara IP domo 4MP | Exterior | IR 30M | PoE | Detecci\xF3n de personas", 84e3),
-    mk("C\xE1maras IP", "PTZ", "DEMO-PTZ", "C\xE1mara PTZ 2MP | Zoom x25 | IR 100M | PoE+", 69e4, "sin_stock"),
-    mk("Grabadores", "NVR", "DEMO-N4", "NVR 4 canales | 4K | PoE | 1 disco hasta 8TB", 15e4),
-    mk("Grabadores", "NVR", "DEMO-N8", "NVR 8 canales | 4K | PoE | 2 discos hasta 8TB c/u", 26e4),
-    mk("Grabadores", "DVR", "DEMO-X4", "DVR 4 canales | 1080P | 5 en 1 | 1 disco", 65e3),
-    mk("Control de acceso", "Terminales", "DEMO-FACE", 'Terminal facial | Pantalla 7" | Tarjeta y app | Registro de eventos', 38e4),
-    mk("Control de acceso", "Lectores", "DEMO-RFID", "Lector de tarjeta RFID | Wiegand | Exterior", 22e3),
-    mk("Control de acceso", "Cerraduras", "DEMO-CER", "Cerradura electromagn\xE9tica 300 kg | Con soporte", 31e3),
-    mk("Redes", "Switches", "DEMO-SW8", "Switch PoE 8 puertos | 10/100 | 2 uplink", 72e3),
-    mk("Redes", "Switches", "DEMO-SW16", "Switch PoE 16 puertos | Gigabit | 2 SFP", 19e4),
-    mk("Redes", "Cable", "DEMO-UTP", "Bobina UTP Cat5e exterior | 305 m", 12e4),
-    mk("Accesorios", "Fuentes", "DEMO-F12", "Fuente 12V 5A | Con ficha", 11e3),
-    mk("Accesorios", "Racks", "DEMO-R12", "Rack mural 12U | Puerta de vidrio | Con llave", 21e4),
-    mk("Accesorios", "Bater\xEDas", "DEMO-BAT", "Bater\xEDa recargable 12V 7Ah", 14e3),
-    mk("Liquidaciones", "", "DEMO-L1", "Kit 4 c\xE1maras bullet 1080P + DVR 4 canales", 13e4),
-    mk("Liquidaciones", "", "DEMO-L2", "Kit 2 c\xE1maras domo 1080P + DVR 4 canales", 0, "consultar")
-  ]
-};
-var enc = new TextEncoder();
-var COOKIE = "rhg";
-var TTL = 60 * 60 * 12;
+var SHEET_ID = "16pnoHtlqJZe-z3TKIid5_30AWFDBLbU5cs_kswoKt90";
+var TABS = ["Hikvision Cctv-IP", "Hik Alarma/Portero/Acceso", "DAHUA", "EZVIZ", "IMOU", "Tp-Link", "Intelbras", "Accesorios / Varios", "Commax", "Celulares", "Liq/Outlet"];
 var memo = { t: 0, d: null };
-var json = /* @__PURE__ */ __name2((o, s = 200, h = {}) => new Response(JSON.stringify(o), { status: s, headers: { "content-type": "application/json; charset=utf-8", "cache-control": "private, no-store", ...h } }), "json");
-var b64 = /* @__PURE__ */ __name2((u8) => btoa(String.fromCharCode(...u8)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""), "b64");
-var unb64 = /* @__PURE__ */ __name2((s) => Uint8Array.from(atob(s.replace(/-/g, "+").replace(/_/g, "/")), (c) => c.charCodeAt(0)), "unb64");
-async function sign(secret, data) {
-  const k = await crypto.subtle.importKey("raw", enc.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
-  return b64(new Uint8Array(await crypto.subtle.sign("HMAC", k, enc.encode(data))));
+function csv(b) {
+  const rows = [];
+  let r = [], f = "", q = false;
+  for (let i = 0; i < b.length; i++) {
+    const c = b[i];
+    if (q) {
+      if (c === '"') {
+        if (b[i + 1] === '"') {
+          f += '"';
+          i++;
+        } else
+          q = false;
+      } else
+        f += c;
+    } else if (c === '"')
+      q = true;
+    else if (c === ",") {
+      r.push(f);
+      f = "";
+    } else if (c === "\n") {
+      r.push(f);
+      rows.push(r);
+      r = [];
+      f = "";
+    } else if (c !== "\r")
+      f += c;
+  }
+  if (f || r.length) {
+    r.push(f);
+    rows.push(r);
+  }
+  return rows;
 }
-__name(sign, "sign");
-__name2(sign, "sign");
-function same(a, b) {
-  if (a.length !== b.length)
-    return false;
-  let r = 0;
-  for (let i = 0; i < a.length; i++)
-    r |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  return r === 0;
+__name(csv, "csv");
+__name2(csv, "csv");
+var clean = /* @__PURE__ */ __name2((s) => String(s || "").replace(/\s+/g, " ").trim(), "clean");
+var aNum = /* @__PURE__ */ __name2((s) => {
+  const t = String(s || "").replace(/[$\s]/g, "");
+  return /^[\d.,]+$/.test(t) ? Number(t.replace(/[.,]/g, "")) : null;
+}, "aNum");
+function parse(cat, rows, meta) {
+  const out = [];
+  let g = "";
+  rows.forEach((row) => {
+    const a = clean(row[0]), b = clean(row[1]), p = aNum(row[2]), e = clean(row[3]);
+    const blob = row.join(" ");
+    const m = blob.match(/Compra m[ií]nima \$\s*([\d.]+)/i);
+    if (m && !meta.minimo)
+      meta.minimo = Number(m[1].replace(/\./g, ""));
+    const u = blob.match(/Actualizada\s+(\d{2}\/\d{2}\/\d{4})\s*·\s*(\d{2}:\d{2})/i);
+    if (u && !meta.actualizado)
+      meta.actualizado = u[1] + " " + u[2] + " hs";
+    if (!a || /^C[ÓO]DIGO$/i.test(a))
+      return;
+    if (!b && p === null && !e) {
+      if (a.length < 60 && !/^Precios sin IVA/i.test(a))
+        g = a.replace(/!+/g, "").trim();
+      return;
+    }
+    if (!b)
+      return;
+    const sin = /SIN STOCK/i.test(e), cons = /CONSULTAR/i.test(e);
+    out.push({ cat, g, c: a, d: b, p: p && !sin ? p : null, e: sin ? "sin_stock" : cons || !p ? "consultar" : "" });
+  });
+  return out;
 }
-__name(same, "same");
-__name2(same, "same");
-async function getData(env) {
-  if (!env.DATA_URL || !env.DATA_TOKEN)
-    return { ...DEMO, demo: true };
-  if (memo.d && Date.now() - memo.t < 10 * 60 * 1e3)
-    return memo.d;
+__name(parse, "parse");
+__name2(parse, "parse");
+async function load(id) {
+  const meta = {};
   try {
-    const r = await fetch(env.DATA_URL + (env.DATA_URL.includes("?") ? "&" : "?") + "token=" + encodeURIComponent(env.DATA_TOKEN), { redirect: "follow" });
-    const d = await r.json();
-    if (d.error || !d.items)
-      throw new Error(d.error || "sin datos");
-    memo = { t: Date.now(), d };
-    return d;
+    const r0 = await fetch(`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&headers=0&sheet=INICIO`);
+    const m0 = (await r0.text()).match(/(\d{2}\/\d{2}\/\d{4})\s*·\s*(\d{2}:\d{2})/);
+    if (m0)
+      meta.actualizado = m0[1] + " " + m0[2] + " hs";
+  } catch (e) {
+  }
+  const parts = await Promise.all(TABS.map(async (t) => {
+    const r = await fetch(`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&headers=0&sheet=${encodeURIComponent(t)}`);
+    if (!r.ok)
+      throw new Error("hoja " + t + " " + r.status);
+    const txt = await r.text();
+    if (txt.trimStart().startsWith("<"))
+      throw new Error("la hoja no es accesible con el enlace");
+    return parse(t, csv(txt), meta);
+  }));
+  return { minimo: meta.minimo || 0, actualizado: meta.actualizado || null, items: parts.flat() };
+}
+__name(load, "load");
+__name2(load, "load");
+async function onRequestGet({ env }) {
+  const h = { "content-type": "application/json; charset=utf-8", "cache-control": "public, max-age=300" };
+  try {
+    if (!memo.d || Date.now() - memo.t > 10 * 60 * 1e3)
+      memo = { t: Date.now(), d: await load(env.SHEET_ID || SHEET_ID) };
+    return new Response(JSON.stringify(memo.d), { headers: h });
   } catch (e) {
     if (memo.d)
-      return memo.d;
-    throw e;
+      return new Response(JSON.stringify(memo.d), { headers: h });
+    return new Response(JSON.stringify({ error: "No se pudo leer la lista en este momento." }), { status: 502, headers: { ...h, "cache-control": "no-store" } });
   }
 }
-__name(getData, "getData");
-__name2(getData, "getData");
-function secretOf(env) {
-  return env.SESSION_SECRET || (env.DATA_URL ? null : "demo-secret");
-}
-__name(secretOf, "secretOf");
-__name2(secretOf, "secretOf");
-async function sesion(req, env, data) {
-  const sec = secretOf(env);
-  if (!sec)
-    return null;
-  const m = (req.headers.get("cookie") || "").match(new RegExp("(?:^|; )" + COOKIE + "=([^;]+)"));
-  if (!m)
-    return null;
-  const [p, s] = m[1].split(".");
-  if (!p || !s)
-    return null;
-  if (!same(await sign(sec, p), s))
-    return null;
-  let o;
-  try {
-    o = JSON.parse(new TextDecoder().decode(unb64(p)));
-  } catch {
-    return null;
-  }
-  if (!o.exp || o.exp < Date.now() / 1e3)
-    return null;
-  const u = (data.usuarios || []).find((x) => x.email === o.e);
-  if (!u)
-    return null;
-  const pf = (data.perfiles || {})[u.perfil];
-  if (!pf)
-    return null;
-  return { email: u.email, nombre: u.nombre, perfil: u.perfil, etiqueta: pf.etiqueta, markup: pf.markup };
-}
-__name(sesion, "sesion");
-__name2(sesion, "sesion");
-async function onRequest({ request, env }) {
-  const url = new URL(request.url);
-  const ruta = url.pathname.replace(/^\/api\//, "").replace(/\/$/, "");
-  let data;
-  try {
-    data = await getData(env);
-  } catch (e) {
-    return json({ error: "No se pudo cargar el cat\xE1logo. Prob\xE1 en unos minutos." }, 502);
-  }
-  if (!secretOf(env))
-    return json({ error: "Falta configurar SESSION_SECRET." }, 500);
-  if (ruta === "catalogo" && request.method === "GET") {
-    const s = await sesion(request, env, data);
-    const items = data.items.map((i) => {
-      const o = { c: i.c, d: i.d, cat: i.cat, g: i.g || "", e: i.e || "" };
-      if (s && i.costo > 0 && i.e !== "sin_stock")
-        o.p = Math.round(i.costo * (1 + s.markup));
-      return o;
-    });
-    return json({ demo: !!data.demo, minimo: data.minimo || 0, actualizado: data.actualizado || null, sesion: s ? { nombre: s.nombre, perfil: s.perfil, etiqueta: s.etiqueta, email: s.email } : null, items });
-  }
-  if (ruta === "login" && request.method === "POST") {
-    let b;
-    try {
-      b = await request.json();
-    } catch {
-      return json({ error: "Solicitud inv\xE1lida" }, 400);
-    }
-    const email = String(b.email || "").trim().toLowerCase(), cod = String(b.codigo || "").trim();
-    await new Promise((r) => setTimeout(r, 350));
-    const u = (data.usuarios || []).find((x) => x.email === email && same(x.codigo, cod));
-    if (!u || !(data.perfiles || {})[u.perfil])
-      return json({ error: "Mail o c\xF3digo incorrectos." }, 401);
-    const sec = secretOf(env);
-    const p = b64(enc.encode(JSON.stringify({ e: u.email, exp: Math.floor(Date.now() / 1e3) + TTL })));
-    const ck = `${COOKIE}=${p}.${await sign(sec, p)}; Path=/; Max-Age=${TTL}; HttpOnly; Secure; SameSite=Lax`;
-    return json({ ok: true }, 200, { "set-cookie": ck });
-  }
-  if (ruta === "logout" && request.method === "POST") {
-    return json({ ok: true }, 200, { "set-cookie": `${COOKIE}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax` });
-  }
-  return json({ error: "No encontrado" }, 404);
-}
-__name(onRequest, "onRequest");
-__name2(onRequest, "onRequest");
+__name(onRequestGet, "onRequestGet");
+__name2(onRequestGet, "onRequestGet");
 var routes = [
   {
-    routePath: "/api/:path*",
+    routePath: "/api/catalogo",
     mountPath: "/api",
-    method: "",
+    method: "GET",
     middlewares: [],
-    modules: [onRequest]
+    modules: [onRequestGet]
   }
 ];
 function lexer(str) {
@@ -337,7 +285,7 @@ function lexer(str) {
 }
 __name(lexer, "lexer");
 __name2(lexer, "lexer");
-function parse(str, options) {
+function parse2(str, options) {
   if (options === void 0) {
     options = {};
   }
@@ -436,8 +384,8 @@ function parse(str, options) {
   }
   return result;
 }
-__name(parse, "parse");
-__name2(parse, "parse");
+__name(parse2, "parse2");
+__name2(parse2, "parse");
 function match(str, options) {
   var keys = [];
   var re = pathToRegexp(str, keys, options);
@@ -518,7 +466,7 @@ function arrayToRegexp(paths, keys, options) {
 __name(arrayToRegexp, "arrayToRegexp");
 __name2(arrayToRegexp, "arrayToRegexp");
 function stringToRegexp(path, keys, options) {
-  return tokensToRegexp(parse(path, options), keys, options);
+  return tokensToRegexp(parse2(path, options), keys, options);
 }
 __name(stringToRegexp, "stringToRegexp");
 __name2(stringToRegexp, "stringToRegexp");

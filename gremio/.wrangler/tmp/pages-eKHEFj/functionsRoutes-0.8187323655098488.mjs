@@ -1,11 +1,11 @@
-import { onRequest as __api___path___js_onRequest } from "/home/claude/ratiohyperion/ratiohyperion-/gremio/functions/api/[[path]].js"
+import { onRequestGet as __api_catalogo_js_onRequestGet } from "/home/claude/ratiohyperion/ratiohyperion-/gremio/functions/api/catalogo.js"
 
 export const routes = [
     {
-      routePath: "/api/:path*",
+      routePath: "/api/catalogo",
       mountPath: "/api",
-      method: "",
+      method: "GET",
       middlewares: [],
-      modules: [__api___path___js_onRequest],
+      modules: [__api_catalogo_js_onRequestGet],
     },
   ]

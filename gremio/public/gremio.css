@@ -25,3 +25,4 @@
 .gr-filters input,.gr-filters select,.gr-auth input{font:inherit;padding:12px 14px;border:1px solid #b9d0ee;border-radius:12px;background:#fff;color:var(--ink,#0b0b0f)}
 .gr-filters input:focus,.gr-filters select:focus,.gr-auth input:focus{outline:2px solid var(--blue);outline-offset:1px}
 .gr-auth .f>div{display:block}
+.gr-upd{font-size:14px;color:var(--muted);margin:0 0 14px}.gr-upd a{color:var(--blue);font-weight:700}
