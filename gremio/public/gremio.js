@@ -1,5 +1,5 @@
 (function(){
-var W='5491160121797',S={items:[],minimo:0,act:'',q:'',cat:'',n:60},cart={};
+var W='5491158862827',S={items:[],minimo:0,act:'',q:'',cat:'',n:60},cart={};
 function $(i){return document.getElementById(i)}
 function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
 function money(n){return '$ '+Math.round(n).toLocaleString('es-AR')}
