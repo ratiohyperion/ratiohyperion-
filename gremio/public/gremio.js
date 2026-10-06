@@ -42,7 +42,7 @@ function showAuth(){
  $('authbox').hidden=false;$('ggrid').hidden=true;var u=document.querySelector('.gr-upd');if(u)u.hidden=true;var a=$('acceso');if(a)a.hidden=true;
  var ha=document.querySelector('.hero-cta a[href="#acceso"]');if(ha){ha.href='#pedido';ha.textContent='Ingresar o registrarme'}
  var q=new URLSearchParams(location.search);
- if(q.get('reset')){show('axreset')}else if(q.get('aviso')==='enlace'){note('El enlace venció o ya se usó. Ingresá, o pedí uno nuevo con "Olvidé mi contraseña".',true)}
+ if(q.get('reset')){show('axreset')}else if(q.get('aviso')==='login'){note('Ingresá o creá tu cuenta para ver la lista de precios.')}else if(q.get('aviso')==='enlace'){note('El enlace venció o ya se usó. Ingresá, o pedí uno nuevo con "Olvidé mi contraseña".',true)}
  $('axt1').onclick=function(){note('');show('axlogin')};$('axt2').onclick=function(){note('');show('axreg')};
  $('axforgot').onclick=function(e){e.preventDefault();note('');show('axforg')};$('axback').onclick=function(e){e.preventDefault();show('axlogin')};
  submit('axlogin','axm1',function(m){var em=$('lg_email').value.trim(),pw=$('lg_pw').value;if(!em||!pw){m.textContent='Ingresá tu mail y contraseña.';return Promise.resolve()}return post('/api/login',{email:em,password:pw}).then(function(d){if(d.ok){history.replaceState(null,'','/');location.reload()}else m.textContent=d.error||'No se pudo ingresar.'})});
