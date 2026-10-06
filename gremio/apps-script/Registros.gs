@@ -33,7 +33,7 @@ function instalar() {
     ['', ''],
     ['Altas por día (últimos 14 días)', 'Altas']
   ];
-  m.getRange(1, 1, filas.length, 2).setFormulas(filas);
+  m.getRange(1, 1, filas.length, 2).setValues(filas); // setValues: los textos quedan como texto y los '=...' como fórmula
   for (var i = 0; i < 14; i++) {
     var r = 11 + i;
     m.getRange(r, 1).setFormula('=TODAY()-' + i).setNumberFormat('ddd dd/mm');
