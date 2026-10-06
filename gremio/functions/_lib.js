@@ -90,7 +90,7 @@ export async function sendMail(env, to, subject, html) {
   if (!env.RESEND_API_KEY) { console.log('[MAIL dev]', to, subject, html.replace(/<[^>]+>/g, ' ')); return true; }
   const r = await fetch('https://api.resend.com/emails', {
     method: 'POST', headers: { authorization: 'Bearer ' + env.RESEND_API_KEY, 'content-type': 'application/json' },
-    body: JSON.stringify({ from, to, subject, html, reply_to: 'gremio@ratiohyperion.com.ar' }),
+    body: JSON.stringify({ from, to, subject, html, text: html.replace(/<br\s*\/?>/g, '\n').replace(/<\/p>/g, '\n\n').replace(/<[^>]+>/g, '').replace(/\n{3,}/g, '\n\n').trim(), reply_to: 'gremio@ratiohyperion.com.ar' }),
   });
   if (!r.ok) console.log('[MAIL error]', r.status, await r.text());
   return r.ok;

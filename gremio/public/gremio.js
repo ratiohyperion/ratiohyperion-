@@ -51,7 +51,8 @@ function showAuth(){
  submit('axforg','axm3',function(m){var em=$('fg_email').value.trim();if(!em){m.textContent='Ingresá tu mail.';return Promise.resolve()}return post('/api/olvide',{email:em}).then(function(d){if(d.ok){show('axlogin');note('Si ese mail está registrado, te enviamos un enlace para elegir una nueva contraseña (vale 1 hora).')}else m.textContent=d.error||'No se pudo enviar.'})});
  submit('axreset','axm4',function(m){return post('/api/reset',{token:q.get('reset'),password:$('rs_pw').value}).then(function(d){if(d.ok){history.replaceState(null,'','/');location.reload()}else m.textContent=d.error||'No se pudo guardar.'})});
 }
-function who(){fetch('/api/me').then(function(r){return r.ok?r.json():null}).then(function(d){if(!d||!d.user)return;var u=d.user,b=$('userbar'),ok=new URLSearchParams(location.search).get('aviso')==='verificado';
+function who(){fetch('/api/me').then(function(r){return r.ok?r.json():null}).then(function(d){if(!d||!d.user)return;var a=$('acceso');if(a)a.hidden=true;var ha=document.querySelector('.hero-cta a[href="#acceso"]');if(ha)ha.hidden=true;
+ var u=d.user,b=$('userbar'),ok=new URLSearchParams(location.search).get('aviso')==='verificado';
  b.hidden=false;b.className='gr-userbar'+(ok?' ok':'');b.innerHTML='';var t=el('span');t.appendChild(document.createTextNode(ok?'¡Mail confirmado! ':'Hola, '));t.appendChild(el('b',null,u.nombre));b.appendChild(t);var x=el('button',null,'Salir');x.type='button';x.onclick=function(){post('/api/logout').then(function(){location.reload()})};b.appendChild(x);
  if(ok)history.replaceState(null,'','/');
  [['g1',u.nombre],['g2',u.empresa],['g3',u.cuit],['g4',u.whatsapp]].forEach(function(p){var e=$(p[0]);if(e&&!e.value&&p[1])e.value=p[1]})}).catch(function(){})}
