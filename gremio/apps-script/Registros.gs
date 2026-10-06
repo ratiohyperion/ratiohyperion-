@@ -60,6 +60,7 @@ function doPost(e) {
     var sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(HOJA);
     var mail = String(d.email || '').toLowerCase().trim();
     if (!mail) return salida_({ ok: false, error: 'sin mail' });
+    if (d.evento === 'descuento') return salida_(descuentoDe_(mail));
     var fecha = d.fecha ? new Date(d.fecha) : new Date();
     var n = sh.getLastRow() - 1, fila = -1;
     if (n > 0) {
@@ -74,6 +75,34 @@ function doPost(e) {
     }
     return salida_({ ok: true });
   } finally { lock.releaseLock(); }
+}
+
+// Descuento del cliente por mail: el individual (col. J) manda sobre el nivel (col. I -> pestaña NIVELES). Sin nada = 0.
+function descuentoDe_(mail) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sh = ss.getSheetByName(HOJA);
+  var n = sh.getLastRow() - 1;
+  if (n < 1) return { ok: true, descuento: 0 };
+  var v = sh.getRange(2, 6, n, 5).getValues();            // columnas F..J
+  for (var i = 0; i < v.length; i++) {
+    if (String(v[i][0]).toLowerCase().trim() !== mail) continue;
+    var nivel = String(v[i][3] || '').trim(), indiv = v[i][4];
+    if (typeof indiv === 'number' && indiv > 0 && indiv <= 1) return { ok: true, descuento: indiv, origen: 'individual' };
+    if (nivel) {
+      var ns = ss.getSheetByName('NIVELES');
+      if (ns && ns.getLastRow() > 1) {
+        var t = ns.getRange(2, 1, ns.getLastRow() - 1, 2).getValues();
+        for (var k = 0; k < t.length; k++) {
+          if (String(t[k][0]).trim() === nivel) {
+            var p = Number(t[k][1]);
+            return { ok: true, descuento: p > 0 && p <= 1 ? p : 0, origen: 'nivel' };
+          }
+        }
+      }
+    }
+    return { ok: true, descuento: 0 };
+  }
+  return { ok: true, descuento: 0 };
 }
 
 function salida_(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }
