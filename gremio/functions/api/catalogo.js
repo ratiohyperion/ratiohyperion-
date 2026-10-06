@@ -1,5 +1,6 @@
 // GET /api/catalogo — lee la "LISTA GREMIO - RATIO HYPERION" de Google Sheets (hoja compartida con enlace)
 // y la devuelve como JSON. Cache de 10 min. Variable opcional: SHEET_ID.
+import { json as _j, currentUser } from '../_lib.js';
 const SHEET_ID = '16pnoHtlqJZe-z3TKIid5_30AWFDBLbU5cs_kswoKt90';
 const TABS = ['Hikvision Cctv-IP', 'Hik Alarma/Portero/Acceso', 'DAHUA', 'EZVIZ', 'IMOU', 'Tp-Link', 'Intelbras', 'Accesorios / Varios', 'Commax', 'Celulares', 'Liq/Outlet'];
 let memo = { t: 0, d: null };
@@ -65,8 +66,10 @@ async function load(id) {
   return { minimo: meta.minimo || 0, actualizado: meta.actualizado || null, items: parts.flat() };
 }
 
-export async function onRequestGet({ env }) {
-  const h = { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'public, max-age=300' };
+export async function onRequestGet({ request, env }) {
+  // Solo usuarios registrados y con sesión (si la base de datos no está conectada, queda abierto como antes)
+  if (env.DB && !(await currentUser(request, env))) return _j({ error: 'auth' }, 401);
+  const h = { 'content-type': 'application/json; charset=utf-8', 'cache-control': env.DB ? 'private, max-age=300' : 'public, max-age=300' };
   try {
     if (!memo.d || Date.now() - memo.t > 10 * 60 * 1000) memo = { t: Date.now(), d: await load(env.SHEET_ID || SHEET_ID) };
     return new Response(JSON.stringify(memo.d), { headers: h });
