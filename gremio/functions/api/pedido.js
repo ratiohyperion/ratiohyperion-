@@ -1,8 +1,16 @@
-// POST /api/pedido — recibe el carrito de un cliente logueado y lo manda al cotizador (Apps Script).
-// Los datos del cliente (nombre, CUIT, WhatsApp) salen de la sesión, nunca del body.
-// Responde enseguida; el llamado al cotizador se hace en segundo plano (waitUntil) y nunca bloquea al cliente.
-import { json, currentUser } from '../_lib.js';
+// POST /api/pedido — recibe el carrito de un cliente logueado, lo manda al cotizador (Apps Script)
+// y espera la respuesta (hasta ~28s) para poder mandarle el PDF por mail y devolver el número al front.
+// Los datos del cliente (nombre, CUIT, WhatsApp, mail) salen de la sesión, nunca del body.
+// El pedido por WhatsApp sale siempre, con o sin número: esta función nunca debe romper ese flujo.
+import { json, currentUser, sendMail } from '../_lib.js';
 import { getCatalogo } from './catalogo.js';
+
+const JAVIER = 'javier@ratiohyperion.com.ar';
+
+async function avisoInterno(env, texto, u) {
+  try { await sendMail(env, JAVIER, 'Cotizador web: aviso', `<p>${texto}</p><p>Cliente: ${u.nombre} · ${u.email} · CUIT ${u.cuit}</p>`); }
+  catch (e) { console.log('[pedido] aviso interno', String(e)); }
+}
 
 export async function onRequestPost({ request, env, waitUntil }) {
   const u = await currentUser(request, env);
@@ -26,17 +34,34 @@ export async function onRequestPost({ request, env, waitUntil }) {
     console.log('[pedido] catalogo', String(e)); // si falla la lectura del catálogo, no bloqueamos el pedido
   }
 
+  if (!env.COTIZADOR_URL || !env.COTIZADOR_SECRET) return json({ ok: true, numero: null });
+
   const pedido = { cuit: u.cuit, nombre: u.nombre, contacto: u.empresa || '', whatsapp: u.whatsapp, items };
-  if (env.COTIZADOR_URL && env.COTIZADOR_SECRET) {
-    waitUntil(
-      fetch(env.COTIZADOR_URL, {
-        method: 'POST', headers: { 'content-type': 'application/json' }, redirect: 'follow',
-        body: JSON.stringify({ secret: env.COTIZADOR_SECRET, pedido, devolverPdf: false }),
-      }).then(async (r) => {
-        const d = await r.json().catch(() => ({}));
-        if (!d.ok) console.log('[cotizador] error', d.error || r.status);
-      }).catch((e) => console.log('[cotizador] fetch', String(e)))
-    );
+  const ctrl = new AbortController();
+  const to = setTimeout(() => ctrl.abort(), 28000);
+  try {
+    const r = await fetch(env.COTIZADOR_URL, {
+      method: 'POST', headers: { 'content-type': 'application/json' }, redirect: 'follow', signal: ctrl.signal,
+      body: JSON.stringify({ secret: env.COTIZADOR_SECRET, pedido, devolverPdf: true }),
+    });
+    const d = await r.json().catch(() => ({}));
+    clearTimeout(to);
+
+    if (!d.ok) {
+      if (d.error === 'limite diario') { waitUntil(avisoInterno(env, 'Cliente alcanzó el límite diario de cotizaciones automáticas.', u)); return json({ ok: true, numero: null, aviso: 'limite' }); }
+      waitUntil(avisoInterno(env, 'El cotizador devolvió un error: ' + (d.error || 'desconocido') + '.', u));
+      return json({ ok: true, numero: null });
+    }
+
+    if (d.pdfBase64) {
+      const html = `<p>Hola ${u.nombre},</p><p>Adjuntamos tu cotización <b>${d.numero}</b> de Ratio Hyperion · Gremio e instaladores.</p><p>Los precios no incluyen IVA. La validez de la cotización figura en el PDF adjunto.</p><p>Cualquier consulta, respondé este mail o escribinos por WhatsApp.</p>`;
+      const mailOk = await sendMail(env, u.email, 'Tu cotización ' + d.numero, html, [{ filename: d.numero + '.pdf', content: d.pdfBase64 }]).catch((e) => { console.log('[pedido] mail cliente', String(e)); return false; });
+      if (!mailOk) waitUntil(avisoInterno(env, 'Se generó la cotización ' + d.numero + ' pero no se pudo enviar el mail con el PDF.', u));
+    }
+    return json({ ok: true, numero: d.numero || null });
+  } catch (e) {
+    clearTimeout(to);
+    waitUntil(avisoInterno(env, 'Timeout o error llamando al cotizador: ' + String(e) + '.', u));
+    return json({ ok: true, numero: null });
   }
-  return json({ ok: true });
 }
