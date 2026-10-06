@@ -66,13 +66,18 @@ async function load(id) {
   return { minimo: meta.minimo || 0, actualizado: meta.actualizado || null, items: parts.flat() };
 }
 
+// Catálogo con cache de 10 min, para usar también desde otras funciones (ej. /api/pedido).
+export async function getCatalogo(env) {
+  if (!memo.d || Date.now() - memo.t > 10 * 60 * 1000) memo = { t: Date.now(), d: await load(env.SHEET_ID || SHEET_ID) };
+  return memo.d;
+}
+
 export async function onRequestGet({ request, env }) {
   // Solo usuarios registrados y con sesión (si la base de datos no está conectada, queda abierto como antes)
   if (env.DB && !(await currentUser(request, env))) return _j({ error: 'auth' }, 401);
   const h = { 'content-type': 'application/json; charset=utf-8', 'cache-control': env.DB ? 'private, max-age=300' : 'public, max-age=300' };
   try {
-    if (!memo.d || Date.now() - memo.t > 10 * 60 * 1000) memo = { t: Date.now(), d: await load(env.SHEET_ID || SHEET_ID) };
-    return new Response(JSON.stringify(memo.d), { headers: h });
+    return new Response(JSON.stringify(await getCatalogo(env)), { headers: h });
   } catch (e) {
     if (memo.d) return new Response(JSON.stringify(memo.d), { headers: h });
     return new Response(JSON.stringify({ error: 'No se pudo leer la lista en este momento.' }), { status: 502, headers: { ...h, 'cache-control': 'no-store' } });
