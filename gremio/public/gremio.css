@@ -37,6 +37,21 @@
 .gr-ship svg{width:34px;height:34px;flex:none;fill:none;stroke:var(--blue);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .gr-ship span{color:var(--muted);font-size:14px}
 
+/* ===== Login gremio ===== */
+.gr-ax{max-width:520px;margin:22px auto 8px}
+.gr-axtabs{display:flex;gap:8px;margin-bottom:16px}
+.gr-axtabs button{flex:1;border:1px solid #b9d0ee;background:#fff;color:var(--navy);border-radius:999px;padding:11px 14px;font:700 14px Inter,sans-serif;cursor:pointer;min-height:44px}
+.gr-axtabs button.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.gr-ax h3{margin:0 0 4px;font-size:18px}
+.gr-axnote{background:#eaf3ff;border:1px solid #b9d0ee;border-radius:12px;padding:10px 14px;margin:0 0 12px;font-size:14px;color:#0b2a5c}
+.gr-axnote.bad{background:#fff5f5;border-color:#f0b8b4;color:#b3261e}
+.gr-axnote2{margin:0 0 4px;font-size:14px;color:var(--muted)}
+.gr-axlink{margin:6px 0 0;text-align:center;font-size:14px}.gr-axlink a{color:var(--blue);font-weight:700}
+.gr-ax .btn{min-height:48px}
+.gr-userbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:#fff;border:1px solid #b9d0ee;border-radius:14px;padding:10px 16px;margin:0 0 14px;font-size:14px}
+.gr-userbar b{color:#0b2a5c}.gr-userbar button{border:0;background:none;color:var(--blue);font:700 14px Inter,sans-serif;cursor:pointer;padding:8px 4px}
+.gr-userbar.ok{background:#eaf8ef;border-color:#a8dcb9}
+@media(max-width:900px){.gr-ax input{font-size:16px}}
 /* ===== Móvil / tablet (<=900px): carrito cómodo. En PC no cambia nada. ===== */
 .gr-lq,.gr-bar{display:none}
 @media(max-width:900px){
@@ -60,3 +75,5 @@ body.cart-below .gr-bar:not([hidden]){display:flex;position:fixed;left:0;right:0
 body.cart-below .gr-bar b{font-size:17px}
 .wa{display:none}
 }
+/* hidden debe ocultar aunque el elemento tenga display propio (solo elementos del login) */
+.gr-ax[hidden],.gr-ax [hidden],.gr-userbar[hidden],#ggrid[hidden],.gr-upd[hidden]{display:none!important}

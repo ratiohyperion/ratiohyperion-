@@ -16,7 +16,34 @@
 <section class="section" id="pedido"><div class="wrap"><span class="kicker">Catálogo y pedido online</span><h2>Armá tu pedido</h2><p class="lead">Buscá productos, sumá cantidades y enviá tu pedido. No se cobra nada en la web: el equipo confirma stock y condiciones y coordina el pago con vos.</p>
 <p class="gr-upd"><span id="gupd"></span> · Precios sin IVA · <a href="/lista" target="_blank" rel="noopener">Lista de precios Gremio · Ratio Hyperion</a></p>
 <div class="gr-ship"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7zM7 18.5a1.5 1.5 0 1 0 0 .01M17 18.5a1.5 1.5 0 1 0 0 .01"/></svg><div><b>Envíos a todo el país</b> por Buspack, Correo Argentino y Mercado Envíos.<br><span>Sin costo adicional de embalaje ni de despacho.<br>Costo de envío a cargo del cliente, según localidad y cantidad de bultos.<br>Los pedidos se despachan dentro de las 24 a 48 hs hábiles de confirmado el pago.</span></div></div>
-<div class="gr-grid"><div>
+<div id="userbar" class="gr-userbar" hidden></div>
+<div id="authbox" class="panel gr-ax" hidden>
+<div class="gr-axtabs"><button type="button" id="axt1" class="on">Ingresar</button><button type="button" id="axt2">Crear cuenta</button></div>
+<p class="gr-axnote" id="axnote" hidden></p>
+<form id="axlogin" class="dr-form" novalidate><h3>Ingresá a la lista del gremio</h3>
+<div><label for="lg_email">Mail</label><input id="lg_email" type="email" autocomplete="username" inputmode="email"></div>
+<div><label for="lg_pw">Contraseña</label><input id="lg_pw" type="password" autocomplete="current-password"></div>
+<p class="dr-msg" id="axm1"></p><button class="btn btn-blue" type="submit" style="width:100%">Ingresar</button>
+<p class="gr-axlink"><a href="#" id="axforgot">Olvidé mi contraseña</a></p></form>
+<form id="axreg" class="dr-form" novalidate hidden><h3>Creá tu cuenta (una sola vez)</h3>
+<p class="gr-axnote2">Es gratis y solo toma un minuto. Te enviamos un mail para confirmar tu cuenta.</p>
+<div><label for="rg_nombre">Nombre y apellido *</label><input id="rg_nombre" autocomplete="name"></div>
+<div><label for="rg_empresa">Empresa o razón social</label><input id="rg_empresa" autocomplete="organization"></div>
+<div><label for="rg_cuit">CUIT *</label><input id="rg_cuit" inputmode="numeric" placeholder="20-12345678-9"></div>
+<div><label for="rg_whatsapp">WhatsApp *</label><input id="rg_whatsapp" inputmode="tel" autocomplete="tel"></div>
+<div><label for="rg_email">Mail *</label><input id="rg_email" type="email" autocomplete="email" inputmode="email"></div>
+<div><label for="rg_pw">Contraseña * (mínimo 8 caracteres)</label><input id="rg_pw" type="password" autocomplete="new-password"></div>
+<input id="rg_web" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;height:0;width:0">
+<p class="dr-msg" id="axm2"></p><button class="btn btn-blue" type="submit" style="width:100%">Crear cuenta</button></form>
+<form id="axforg" class="dr-form" novalidate hidden><h3>Recuperar contraseña</h3>
+<div><label for="fg_email">Mail con el que te registraste</label><input id="fg_email" type="email" autocomplete="username" inputmode="email"></div>
+<p class="dr-msg" id="axm3"></p><button class="btn btn-blue" type="submit" style="width:100%">Enviarme el enlace</button>
+<p class="gr-axlink"><a href="#" id="axback">Volver a ingresar</a></p></form>
+<form id="axreset" class="dr-form" novalidate hidden><h3>Elegí tu nueva contraseña</h3>
+<div><label for="rs_pw">Nueva contraseña (mínimo 8 caracteres)</label><input id="rs_pw" type="password" autocomplete="new-password"></div>
+<p class="dr-msg" id="axm4"></p><button class="btn btn-blue" type="submit" style="width:100%">Guardar y entrar</button></form>
+</div>
+<div class="gr-grid" id="ggrid"><div>
 <div class="gr-filters"><input id="gq" type="search" placeholder="Buscar por código o descripción (ej: domo 4MP, DS-7204)" aria-label="Buscar"><select id="gcat" aria-label="Categoría"></select></div>
 <p class="gr-count" id="gcount"></p><div class="gr-items" id="gitems"><p class="empty">Cargando catálogo…</p></div><button class="btn btn-line" id="gmore" hidden style="margin-top:14px">Mostrar más</button></div>
 <aside class="gr-cart panel"><h3>Mi pedido</h3><ul id="gcart" class="gr-list"><li class="empty">Todavía no agregaste productos.</li></ul><div class="gr-total" id="gtotal"></div>

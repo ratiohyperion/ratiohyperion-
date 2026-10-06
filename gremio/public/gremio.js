@@ -33,7 +33,28 @@ document.addEventListener('input',function(e){if(e.target.classList&&e.target.cl
 var tm;$('gq').oninput=function(){clearTimeout(tm);var v=this.value;tm=setTimeout(function(){S.q=v;S.n=60;render()},150)};
 $('gcat').onchange=function(){S.cat=this.value;S.n=60;render()};
 $('gmore').onclick=function(){S.n+=60;render()};
-function load(){fetch('/api/catalogo').then(function(r){return r.json()}).then(function(d){if(d.error)throw new Error(d.error);S.items=d.items;S.minimo=d.minimo;$('gupd').textContent=d.actualizado?'Lista actualizada: '+d.actualizado:'';cats();render()}).catch(function(){$('gitems').innerHTML='';$('gitems').appendChild(el('p','empty','No pudimos cargar la lista en este momento. Escribinos por WhatsApp.'))})}
-var gb=$('gbar'),gc=document.querySelector('.gr-cart');if(gb&&gc){gb.onclick=function(){gc.scrollIntoView({behavior:'smooth',block:'start'})};if(window.IntersectionObserver){new IntersectionObserver(function(es){var e=es[0];document.body.classList.toggle('cart-below',!e.isIntersecting&&e.boundingClientRect.top>0)}).observe(gc)}else document.body.classList.add('cart-below')}
+function post(u,b){return fetch(u,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(b||{})}).then(function(r){return r.json().catch(function(){return{}}).then(function(d){d._s=r.status;return d})})}
+function show(id){['axlogin','axreg','axforg','axreset'].forEach(function(f){$(f).hidden=f!==id});$('axt1').classList.toggle('on',id==='axlogin'||id==='axforg'||id==='axreset');$('axt2').classList.toggle('on',id==='axreg')}
+function note(t,bad){var n=$('axnote');n.hidden=!t;n.textContent=t||'';n.className='gr-axnote'+(bad?' bad':'')}
+function busy(f,on){var b=f.querySelector('button[type=submit]');if(b){b.disabled=on;b.style.opacity=on?'.6':''}}
+function submit(f,m,fn){$(f).onsubmit=function(e){e.preventDefault();var msg=$(m);msg.textContent='';var form=$(f);busy(form,true);fn(msg).then(function(){busy(form,false)},function(){busy(form,false);msg.textContent='No pudimos conectar. Reintentá en un momento.'})}}
+function showAuth(){
+ $('authbox').hidden=false;$('ggrid').hidden=true;var u=document.querySelector('.gr-upd');if(u)u.hidden=true;var a=$('acceso');if(a)a.hidden=true;
+ var ha=document.querySelector('.hero-cta a[href="#acceso"]');if(ha){ha.href='#pedido';ha.textContent='Ingresar o registrarme'}
+ var q=new URLSearchParams(location.search);
+ if(q.get('reset')){show('axreset')}else if(q.get('aviso')==='enlace'){note('El enlace venció o ya se usó. Ingresá, o pedí uno nuevo con "Olvidé mi contraseña".',true)}
+ $('axt1').onclick=function(){note('');show('axlogin')};$('axt2').onclick=function(){note('');show('axreg')};
+ $('axforgot').onclick=function(e){e.preventDefault();note('');show('axforg')};$('axback').onclick=function(e){e.preventDefault();show('axlogin')};
+ submit('axlogin','axm1',function(m){var em=$('lg_email').value.trim(),pw=$('lg_pw').value;if(!em||!pw){m.textContent='Ingresá tu mail y contraseña.';return Promise.resolve()}return post('/api/login',{email:em,password:pw}).then(function(d){if(d.ok){history.replaceState(null,'','/');location.reload()}else m.textContent=d.error||'No se pudo ingresar.'})});
+ submit('axreg','axm2',function(m){var g=function(i){return $(i).value.trim()};if(!g('rg_nombre')||!g('rg_cuit')||!g('rg_whatsapp')||!g('rg_email')||!$('rg_pw').value){m.textContent='Completá los campos con *.';return Promise.resolve()}
+  return post('/api/registro',{nombre:g('rg_nombre'),empresa:g('rg_empresa'),cuit:g('rg_cuit'),whatsapp:g('rg_whatsapp'),email:g('rg_email'),password:$('rg_pw').value,web:$('rg_web').value}).then(function(d){if(d.ok){show('axlogin');$('lg_email').value=g('rg_email');note('¡Listo! Te enviamos un mail a '+g('rg_email')+' para confirmar tu cuenta. Revisá también la carpeta de spam. Al confirmar entrás automáticamente.')}else m.textContent=d.error||'No se pudo crear la cuenta.'})});
+ submit('axforg','axm3',function(m){var em=$('fg_email').value.trim();if(!em){m.textContent='Ingresá tu mail.';return Promise.resolve()}return post('/api/olvide',{email:em}).then(function(d){if(d.ok){show('axlogin');note('Si ese mail está registrado, te enviamos un enlace para elegir una nueva contraseña (vale 1 hora).')}else m.textContent=d.error||'No se pudo enviar.'})});
+ submit('axreset','axm4',function(m){return post('/api/reset',{token:q.get('reset'),password:$('rs_pw').value}).then(function(d){if(d.ok){history.replaceState(null,'','/');location.reload()}else m.textContent=d.error||'No se pudo guardar.'})});
+}
+function who(){fetch('/api/me').then(function(r){return r.ok?r.json():null}).then(function(d){if(!d||!d.user)return;var u=d.user,b=$('userbar'),ok=new URLSearchParams(location.search).get('aviso')==='verificado';
+ b.hidden=false;b.className='gr-userbar'+(ok?' ok':'');b.innerHTML='';var t=el('span');t.appendChild(document.createTextNode(ok?'¡Mail confirmado! ':'Hola, '));t.appendChild(el('b',null,u.nombre));b.appendChild(t);var x=el('button',null,'Salir');x.type='button';x.onclick=function(){post('/api/logout').then(function(){location.reload()})};b.appendChild(x);
+ if(ok)history.replaceState(null,'','/');
+ [['g1',u.nombre],['g2',u.empresa],['g3',u.cuit],['g4',u.whatsapp]].forEach(function(p){var e=$(p[0]);if(e&&!e.value&&p[1])e.value=p[1]})}).catch(function(){})}
+function load(){fetch('/api/catalogo').then(function(r){if(r.status===401){showAuth();return}return r.json().then(function(d){if(d.error)throw new Error(d.error);S.items=d.items;S.minimo=d.minimo;$('gupd').textContent=d.actualizado?'Lista actualizada: '+d.actualizado:'';cats();render();who()})}).catch(function(){$('gitems').innerHTML='';$('gitems').appendChild(el('p','empty','No pudimos cargar la lista en este momento. Escribinos por WhatsApp.'))})}
 load();
 })();
