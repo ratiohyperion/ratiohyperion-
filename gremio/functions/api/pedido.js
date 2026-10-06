@@ -38,7 +38,8 @@ export async function onRequestPost({ request, env, waitUntil }) {
 
   const pedido = { cuit: u.cuit, nombre: u.nombre, contacto: u.empresa || '', whatsapp: u.whatsapp, items };
   const ctrl = new AbortController();
-  const to = setTimeout(() => ctrl.abort(), 28000);
+  const to = setTimeout(() => ctrl.abort(), 55000);
+  const start = Date.now();
   try {
     const r = await fetch(env.COTIZADOR_URL, {
       method: 'POST', headers: { 'content-type': 'application/json' }, redirect: 'follow', signal: ctrl.signal,
@@ -61,7 +62,8 @@ export async function onRequestPost({ request, env, waitUntil }) {
     return json({ ok: true, numero: d.numero || null });
   } catch (e) {
     clearTimeout(to);
-    waitUntil(avisoInterno(env, 'Timeout o error llamando al cotizador: ' + String(e) + '.', u));
+    const segs = Math.round((Date.now() - start) / 1000);
+    waitUntil(avisoInterno(env, 'Timeout o error llamando al cotizador (' + segs + 's): ' + String(e) + '.', u));
     return json({ ok: true, numero: null });
   }
 }

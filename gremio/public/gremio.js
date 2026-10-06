@@ -29,12 +29,13 @@ function draw(){var ul=$('gcart'),ks=Object.keys(cart);ul.innerHTML='';if(!ks.le
 function txt(numero){var g=function(i){return $(i).value.trim()},r=total(),lines=Object.keys(cart).map(function(k){var c=cart[k];return '• '+c.q+' × '+(c.p.m?'['+c.p.m+'] ':'')+c.p.c+' — '+c.p.d.slice(0,70)+(c.p.p!=null?' ('+money(c.p.p)+' c/u)':'')});
  return 'Pedido de gremio'+(numero?'\nCotización N° '+numero:'')+'\nNombre: '+g('g1')+(g('g2')?'\nEmpresa: '+g('g2'):'')+'\nCUIT: '+g('g3')+'\nWhatsApp: '+g('g4')+'\n\nProductos:\n'+lines.join('\n')+(r.t?(r.d>0&&r.all?'\n\nSubtotal sin IVA: '+money(r.t)+'\nDescuento gremio ('+pct(r.d)+'): − '+money(r.dm)+'\nTotal estimado sin IVA: '+money(r.n):'\n\nTotal estimado sin IVA: '+money(r.t)):'')+(g('g5')?'\n\nComentarios: '+g('g5'):'')}
 function ok(){var bad=[];['g1','g3','g4'].forEach(function(i){var e=$(i),b=!e.value.trim();e.classList.toggle('err',b);if(b)bad.push(i)});var m='';if(!Object.keys(cart).length)m='Agregá al menos un producto. ';if(bad.length)m+='Completá nombre, CUIT y WhatsApp.';$('gmsg').textContent=m;return !m}
-$('gwa').onclick=function(){if(!ok())return;var btn=$('gwa'),win=window.open('','_blank'),old=btn.textContent;btn.disabled=true;btn.textContent='Generando cotización…';
+var enviando=false;
+$('gwa').onclick=function(){if(enviando||!ok())return;enviando=true;var btn=$('gwa'),win=window.open('','_blank'),old=btn.textContent;btn.disabled=true;btn.textContent='Generando cotización…';
  post('/api/pedido',{items:Object.keys(cart).map(function(k){return{cod:k,qty:cart[k].q}})}).then(function(d){
   if(d&&d.aviso==='limite')$('gmsg').textContent='Alcanzaste el máximo de cotizaciones automáticas de hoy; tu pedido igual fue enviado.';
   var url='https://wa.me/'+W+'?text='+encodeURIComponent(txt(d&&d.numero));
   if(win)win.location=url;else window.open(url,'_blank');
- },function(){var url='https://wa.me/'+W+'?text='+encodeURIComponent(txt());if(win)win.location=url;else window.open(url,'_blank')}).then(function(){btn.disabled=false;btn.textContent=old})};
+ },function(){var url='https://wa.me/'+W+'?text='+encodeURIComponent(txt());if(win)win.location=url;else window.open(url,'_blank')}).then(function(){enviando=false;btn.disabled=false;btn.textContent=old})};
 var gvac=$('gvaciar');if(gvac)gvac.onclick=function(){if(Object.keys(cart).length&&confirm('¿Vaciar el carrito?')){cart={};render()}};
 $('awa').onclick=function(){var g=function(i){return $(i).value.trim()},bad=false;['a1','a3','a4'].forEach(function(i){var e=$(i),b=!g(i);e.classList.toggle('err',b);if(b)bad=true});$('amsg').textContent=bad?'Completá nombre, CUIT y WhatsApp.':'';if(bad)return;window.open('https://wa.me/'+W+'?text='+encodeURIComponent('Hola, soy '+g('a1')+(g('a2')?' ('+g('a2')+')':'')+'. CUIT '+g('a3')+'. Quiero solicitar acceso al sitio del gremio. Mi WhatsApp: '+g('a4')),'_blank')};
 document.addEventListener('input',function(e){if(e.target.classList&&e.target.classList.contains('err')&&e.target.value.trim())e.target.classList.remove('err')});
