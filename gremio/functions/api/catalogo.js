@@ -63,11 +63,13 @@ async function load(id) {
     if (txt.trimStart().startsWith('<')) throw new Error('la hoja no es accesible con el enlace');
     return parse(t, csv(txt), meta);
   }));
-  // Un código repetido en la lista (ej. promo + sección normal + Liq/Outlet) puede traer precios distintos.
-  // El cotizador toma SIEMPRE la primera aparición (en este mismo orden de hojas), así que acá se muestra
-  // solo esa: lo que ve el cliente es lo que se cotiza. Misma normalización de código que el cotizador.
-  const vistos = new Set();
-  const items = parts.flat().filter((i) => { const k = String(i.c).toUpperCase().replace(/\s+/g, ''); if (vistos.has(k)) return false; vistos.add(k); return true; });
+  // Cada ítem se identifica por HOJA + CÓDIGO + DESCRIPCIÓN (clave `k`), no por la posición de la fila:
+  // el mismo código puede estar en la hoja de la marca y en Liq/Outlet (cada uno con su precio), y dentro
+  // de una misma hoja puede repetirse (promo, variantes de celulares). Si aun así la clave se repite, se numera.
+  const nk = (x) => String(x || '').toUpperCase().replace(/\s+/g, '');
+  const cuenta = {};
+  const items = parts.flat();
+  items.forEach((i) => { const base = i.cat + '|' + nk(i.c) + '|' + nk(i.d); cuenta[base] = (cuenta[base] || 0) + 1; i.k = cuenta[base] > 1 ? base + '#' + cuenta[base] : base; });
   return { minimo: meta.minimo || 0, actualizado: meta.actualizado || null, items };
 }
 

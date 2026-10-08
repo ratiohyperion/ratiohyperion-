@@ -51,7 +51,7 @@ export async function onRequestPost({ request, env, waitUntil }) {
 
   const body = await request.json().catch(() => ({}));
   const items = Array.isArray(body.items)
-    ? body.items.filter((i) => i && typeof i.cod === 'string' && i.cod && Number.isFinite(i.qty) && i.qty > 0).map((i) => ({ cod: i.cod, qty: Math.floor(i.qty) }))
+    ? body.items.filter((i) => i && typeof i.cod === 'string' && i.cod && Number.isFinite(i.qty) && i.qty > 0).map((i) => ({ k: String(i.k || ''), cod: i.cod, hoja: String(i.hoja || ''), desc: String(i.desc || ''), qty: Math.floor(i.qty) }))
     : [];
   if (!items.length) return json({ ok: false, error: 'Carrito vacío.' }, 400);
 
@@ -59,9 +59,16 @@ export async function onRequestPost({ request, env, waitUntil }) {
   try {
     const cat = await getCatalogo(env);
     minimo = cat.minimo || 0;
-    const byCod = {}; cat.items.forEach((p) => { byCod[p.c] = p; });
+    // Cada ítem se busca por su clave (hoja + código + descripción); si el carrito trae otra cosa, por hoja + código.
+    // El precio que vio el cliente (pv) y la hoja/descripción salen del catálogo del servidor, no del navegador.
+    const byK = {}, byHC = {}, nk = (x) => String(x || '').toUpperCase().replace(/\s+/g, '');
+    cat.items.forEach((p) => { byK[p.k] = p; const h = p.cat + '|' + nk(p.c); if (!byHC[h]) byHC[h] = p; });
     let subtotal = 0, all = true;
-    items.forEach((i) => { const p = byCod[i.cod]; if (p && p.p != null) subtotal += p.p * i.qty; else all = false; });
+    items.forEach((i) => {
+      const p = byK[i.k] || byHC[i.hoja + '|' + nk(i.cod)];
+      if (p) { i.hoja = p.cat; i.desc = p.d; i.pv = p.p != null ? p.p : 0; }
+      if (p && p.p != null) subtotal += p.p * i.qty; else all = false;
+    });
     if (all && minimo && subtotal < minimo) return json({ ok: false, error: 'No llega a la compra mínima.' }, 400);
   } catch (e) {
     console.log('[pedido] catalogo', String(e)); // si falla la lectura del catálogo, no bloqueamos el pedido
@@ -69,6 +76,7 @@ export async function onRequestPost({ request, env, waitUntil }) {
 
   if (!env.COTIZADOR_URL || !env.COTIZADOR_SECRET) return json({ ok: true, numero: null });
 
+  items.forEach((i) => { delete i.k; });
   const pedido = { cuit: u.cuit, nombre: u.nombre, contacto: u.empresa || '', whatsapp: u.whatsapp, items };
   // Todo el trabajo (cotizador + mail al cliente) corre bajo waitUntil: si el navegador corta la conexión
   // (timeout, celular que pasa a WhatsApp), el mail con el PDF igual sale. La respuesta al front no cambia.
