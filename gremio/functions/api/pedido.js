@@ -12,6 +12,39 @@ async function avisoInterno(env, texto, u) {
   catch (e) { console.log('[pedido] aviso interno', String(e)); }
 }
 
+
+const esc = (t) => String(t == null ? '' : t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+// Datos para transferir según la condición del cliente (hoja PAGOS de "Registros web", editable por él).
+// Si falta cualquier dato o falla la consulta, no se muestran cuentas: se avisa que se envían al confirmar el pedido.
+const SIN_DATOS = '<p>Los datos para realizar la transferencia te los enviamos al confirmar el pedido.</p>';
+const ars = (n) => '$ ' + Math.round(n).toLocaleString('es-AR');
+async function datosPago(env, u, total) {
+  try {
+    if (!env.REGISTROS_URL) return SIN_DATOS;
+    const ctrl = new AbortController();
+    const to = setTimeout(() => ctrl.abort(), 6000);
+    const r = await fetch(env.REGISTROS_URL, {
+      method: 'POST', headers: { 'content-type': 'application/json' }, redirect: 'follow', signal: ctrl.signal,
+      body: JSON.stringify({ secret: env.REGISTROS_SECRET || '', evento: 'pago', email: u.email }),
+    });
+    clearTimeout(to);
+    const d = await r.json().catch(() => ({}));
+    if (!d || !d.ok || !d.titular || !d.cbu) return SIN_DATOS;
+    // total = total neto de la cotización (con el descuento del cliente), devuelto por el cotizador; si no llega, no se muestra monto.
+    const t = Number(total);
+    let importe = '';
+    if (Number.isFinite(t) && t > 0) {
+      if (d.factura === 'A') { const iva = t * 0.21; importe = `<br>Total: ${ars(t)}<br>IVA 21%: ${ars(iva)}<br><b>Total a transferir (con IVA): ${ars(t + iva)}</b>`; }
+      else importe = `<br><b>Total a transferir: ${ars(t)}</b>`;
+    }
+    return `<p><b>Para confirmar tu pedido, transferí a:</b><br>Titular: ${esc(d.titular)}<br>CUIT/CUIL: ${esc(d.cuit)}<br>Banco: ${esc(d.banco)}<br>CBU: ${esc(d.cbu)}${d.alias ? '<br>Alias: ' + esc(d.alias) : ''}${importe}</p><p>Una vez hecha la transferencia, enviá el comprobante respondiendo este mail o por WhatsApp. El pedido se procesa una vez acreditado el pago.</p>`;
+  } catch (e) {
+    console.log('[pedido] datos de pago', String(e));
+    return SIN_DATOS;
+  }
+}
+
 export async function onRequestPost({ request, env, waitUntil }) {
   const u = await currentUser(request, env);
   if (!u) return json({ error: 'auth' }, 401);
@@ -58,7 +91,8 @@ export async function onRequestPost({ request, env, waitUntil }) {
       }
 
       if (d.pdfBase64) {
-        const html = `<p>Hola ${u.nombre},</p><p>Adjuntamos tu cotización <b>${d.numero}</b> de Ratio Hyperion · Gremio e instaladores.</p><p>Los precios no incluyen IVA. La validez de la cotización figura en el PDF adjunto.</p><p>Cualquier consulta, respondé este mail o escribinos por WhatsApp.</p>`;
+        const pago = await datosPago(env, u, d.total);
+        const html = `<p>Hola ${esc(u.nombre)},</p><p>Adjuntamos tu cotización <b>${esc(d.numero)}</b> de Ratio Hyperion · Gremio e instaladores.</p><p>Los precios no incluyen IVA. La validez de la cotización figura en el PDF adjunto.</p>${pago}<p>Cualquier consulta, respondé este mail o escribinos por WhatsApp.</p>`;
         const mailOk = await sendMail(env, u.email, 'Tu cotización ' + d.numero, html, [{ filename: d.numero + '.pdf', content: d.pdfBase64 }]).catch((e) => { console.log('[pedido] mail cliente', String(e)); return false; });
         if (!mailOk) waitUntil(avisoInterno(env, 'Se generó la cotización ' + d.numero + ' pero no se pudo enviar el mail con el PDF.', u));
       }
