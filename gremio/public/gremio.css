@@ -85,3 +85,5 @@ body.cart-below .gr-bar b{font-size:17px}
 }
 /* hidden debe ocultar aunque el elemento tenga display propio (solo elementos del login) */
 .gr-ax[hidden],.gr-ax [hidden],.gr-userbar[hidden],#ggrid[hidden],.gr-upd[hidden]{display:none!important}
+
+.dr-msg.ok{color:#1b7a43;font-weight:600}

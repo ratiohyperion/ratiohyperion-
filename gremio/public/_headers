@@ -1,2 +1,11 @@
 /*
   X-Robots-Tag: noindex, nofollow
+
+/gremio.js
+  Cache-Control: no-cache
+/gremio.css
+  Cache-Control: no-cache
+/style.css
+  Cache-Control: no-cache
+/
+  Cache-Control: no-cache

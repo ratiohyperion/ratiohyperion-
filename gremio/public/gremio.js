@@ -23,7 +23,7 @@ function render(){var L=list(),it=$('gitems');it.innerHTML='';$('gcount').textCo
 var LS='rhg_cart';
 function save(){try{var o={};Object.keys(cart).forEach(function(k){o[k]=cart[k].q});localStorage.setItem(LS,JSON.stringify(o))}catch(e){}}
 function restore(){try{var o=JSON.parse(localStorage.getItem(LS)||'{}'),by={};S.items.forEach(function(p){by[p.c]=p});Object.keys(o).forEach(function(k){var q=Math.floor(o[k]);if(by[k]&&q>0&&by[k].e!=='sin_stock')cart[k]={p:by[k],q:q}})}catch(e){}}
-function reset(){S.gen=false;S.num=null;$('gmsg').textContent=''}
+function reset(){S.gen=false;S.num=null;$('gmsg').textContent='';$('gmsg').className='dr-msg'}
 function set(p,n){reset();var c=cart[p.c]||{p:p,q:0};c.p=p;c.q=Math.max(0,c.q+n);if(c.q)cart[p.c]=c;else delete cart[p.c];save();render()}
 function total(){var t=0,all=true;Object.keys(cart).forEach(function(k){var c=cart[k];if(c.p.p!=null)t+=c.p.p*c.q;else all=false});var dm=Math.round(t*(S.desc||0));return{t:t,all:all,d:S.desc||0,dm:dm,n:t-dm}}
 function pct(d){return (Math.round(d*1000)/10).toString().replace('.',',')+'%'}
@@ -38,7 +38,7 @@ function ok(){var bad=[];['g1','g3','g4'].forEach(function(i){var e=$(i),b=!e.va
 var enviando=false;
 $('gcot').onclick=function(){if(enviando||!ok())return;enviando=true;var btn=$('gcot'),old=btn.textContent;btn.disabled=true;btn.textContent='Generando cotización…';$('gwa').disabled=true;
  post('/api/pedido',{items:Object.keys(cart).map(function(k){return{cod:k,qty:cart[k].q}})}).then(function(d){
-  S.gen=true;S.num=(d&&d.numero)||null;
+  S.gen=true;S.num=(d&&d.numero)||null;$('gmsg').className='dr-msg'+(S.num?' ok':'');
   $('gmsg').textContent=S.num?'Cotización N° '+S.num+' generada. Te la enviamos por mail (revisá spam). Ahora enviá el pedido por WhatsApp.':(d&&d.aviso==='limite'?'Alcanzaste el máximo de cotizaciones automáticas de hoy. Igual podés enviar tu pedido por WhatsApp.':'No pudimos generar el número de cotización ahora. Igual podés enviar tu pedido por WhatsApp.');
  },function(){S.gen=true;S.num=null;$('gmsg').textContent='No pudimos generar la cotización. Igual podés enviar tu pedido por WhatsApp.'}).then(function(){enviando=false;btn.textContent=old;draw()})};
 $('gwa').onclick=function(){if(!S.gen||!ok())return;window.open('https://wa.me/'+W+'?text='+encodeURIComponent(txt(S.num)),'_blank')};
