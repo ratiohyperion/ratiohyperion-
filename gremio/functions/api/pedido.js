@@ -37,33 +37,39 @@ export async function onRequestPost({ request, env, waitUntil }) {
   if (!env.COTIZADOR_URL || !env.COTIZADOR_SECRET) return json({ ok: true, numero: null });
 
   const pedido = { cuit: u.cuit, nombre: u.nombre, contacto: u.empresa || '', whatsapp: u.whatsapp, items };
-  const ctrl = new AbortController();
-  const to = setTimeout(() => ctrl.abort(), 55000);
-  const start = Date.now();
-  try {
-    const r = await fetch(env.COTIZADOR_URL, {
-      method: 'POST', headers: { 'content-type': 'application/json' }, redirect: 'follow', signal: ctrl.signal,
-      body: JSON.stringify({ secret: env.COTIZADOR_SECRET, pedido, devolverPdf: true }),
-    });
-    const d = await r.json().catch(() => ({}));
-    clearTimeout(to);
+  // Todo el trabajo (cotizador + mail al cliente) corre bajo waitUntil: si el navegador corta la conexión
+  // (timeout, celular que pasa a WhatsApp), el mail con el PDF igual sale. La respuesta al front no cambia.
+  const trabajo = (async () => {
+    const ctrl = new AbortController();
+    const to = setTimeout(() => ctrl.abort(), 55000);
+    const start = Date.now();
+    try {
+      const r = await fetch(env.COTIZADOR_URL, {
+        method: 'POST', headers: { 'content-type': 'application/json' }, redirect: 'follow', signal: ctrl.signal,
+        body: JSON.stringify({ secret: env.COTIZADOR_SECRET, pedido, devolverPdf: true }),
+      });
+      const d = await r.json().catch(() => ({}));
+      clearTimeout(to);
 
-    if (!d.ok) {
-      if (d.error === 'limite diario') { waitUntil(avisoInterno(env, 'Cliente alcanzó el límite diario de cotizaciones automáticas.', u)); return json({ ok: true, numero: null, aviso: 'limite' }); }
-      waitUntil(avisoInterno(env, 'El cotizador devolvió un error: ' + (d.error || 'desconocido') + '.', u));
+      if (!d.ok) {
+        if (d.error === 'limite diario') { waitUntil(avisoInterno(env, 'Cliente alcanzó el límite diario de cotizaciones automáticas.', u)); return json({ ok: true, numero: null, aviso: 'limite' }); }
+        waitUntil(avisoInterno(env, 'El cotizador devolvió un error: ' + (d.error || 'desconocido') + '.', u));
+        return json({ ok: true, numero: null });
+      }
+
+      if (d.pdfBase64) {
+        const html = `<p>Hola ${u.nombre},</p><p>Adjuntamos tu cotización <b>${d.numero}</b> de Ratio Hyperion · Gremio e instaladores.</p><p>Los precios no incluyen IVA. La validez de la cotización figura en el PDF adjunto.</p><p>Cualquier consulta, respondé este mail o escribinos por WhatsApp.</p>`;
+        const mailOk = await sendMail(env, u.email, 'Tu cotización ' + d.numero, html, [{ filename: d.numero + '.pdf', content: d.pdfBase64 }]).catch((e) => { console.log('[pedido] mail cliente', String(e)); return false; });
+        if (!mailOk) waitUntil(avisoInterno(env, 'Se generó la cotización ' + d.numero + ' pero no se pudo enviar el mail con el PDF.', u));
+      }
+      return json({ ok: true, numero: d.numero || null });
+    } catch (e) {
+      clearTimeout(to);
+      const segs = Math.round((Date.now() - start) / 1000);
+      waitUntil(avisoInterno(env, 'Timeout o error llamando al cotizador (' + segs + 's): ' + String(e) + '.', u));
       return json({ ok: true, numero: null });
     }
-
-    if (d.pdfBase64) {
-      const html = `<p>Hola ${u.nombre},</p><p>Adjuntamos tu cotización <b>${d.numero}</b> de Ratio Hyperion · Gremio e instaladores.</p><p>Los precios no incluyen IVA. La validez de la cotización figura en el PDF adjunto.</p><p>Cualquier consulta, respondé este mail o escribinos por WhatsApp.</p>`;
-      const mailOk = await sendMail(env, u.email, 'Tu cotización ' + d.numero, html, [{ filename: d.numero + '.pdf', content: d.pdfBase64 }]).catch((e) => { console.log('[pedido] mail cliente', String(e)); return false; });
-      if (!mailOk) waitUntil(avisoInterno(env, 'Se generó la cotización ' + d.numero + ' pero no se pudo enviar el mail con el PDF.', u));
-    }
-    return json({ ok: true, numero: d.numero || null });
-  } catch (e) {
-    clearTimeout(to);
-    const segs = Math.round((Date.now() - start) / 1000);
-    waitUntil(avisoInterno(env, 'Timeout o error llamando al cotizador (' + segs + 's): ' + String(e) + '.', u));
-    return json({ ok: true, numero: null });
-  }
+  })();
+  waitUntil(trabajo.catch(() => {}));
+  return await trabajo;
 }
