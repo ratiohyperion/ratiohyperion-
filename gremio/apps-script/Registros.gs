@@ -61,6 +61,7 @@ function doPost(e) {
     var mail = String(d.email || '').toLowerCase().trim();
     if (!mail) return salida_({ ok: false, error: 'sin mail' });
     if (d.evento === 'descuento') return salida_(descuentoDe_(mail));
+    if (d.evento === 'pago') return salida_(pagoDe_(mail));
     var fecha = d.fecha ? new Date(d.fecha) : new Date();
     var n = sh.getLastRow() - 1, fila = -1;
     if (n > 0) {
@@ -106,3 +107,49 @@ function descuentoDe_(mail) {
 }
 
 function salida_(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }
+
+
+// ---- Datos de pago por condición del cliente (agregado 08/10/2026) ----
+// Columna K de REGISTROS = "Condición IVA" (lista desplegable, la completa él a mano).
+// Pestaña PAGOS: A Condición | B Titular | C CUIT/CUIL | D Banco | E CBU | F Alias | G Factura (A o C).
+// Si la condición está vacía o la fila de PAGOS está incompleta, devuelve sin datos y la web avisa que se envían al confirmar.
+function PAGOS_instalar() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sh = ss.getSheetByName(HOJA);
+  sh.getRange('K1').setValue('Condición IVA').setFontWeight('bold').setBackground('#0b2a5c').setFontColor('#ffffff');
+  sh.getRange('K2:K1000').setDataValidation(SpreadsheetApp.newDataValidation()
+    .requireValueInList(['Responsable inscripto', 'Monotributo', 'Consumidor final'], true).setAllowInvalid(false).build());
+  sh.setColumnWidth(11, 170);
+  var p = ss.getSheetByName('PAGOS') || ss.insertSheet('PAGOS');
+  if (p.getLastRow() === 0) {
+    p.getRange(1, 1, 1, 7).setValues([['Condición', 'Titular', 'CUIT/CUIL', 'Banco', 'CBU', 'Alias', 'Factura (A o C)']])
+      .setFontWeight('bold').setBackground('#0b2a5c').setFontColor('#ffffff');
+    p.getRange(2, 1, 3, 7).setValues([
+      ['Responsable inscripto', '', '', '', '', '', 'A'],
+      ['Monotributo', '', '', '', '', '', 'C'],
+      ['Consumidor final', '', '', '', '', '', 'C']
+    ]);
+    p.getRange('C:C').setNumberFormat('@'); p.getRange('E:E').setNumberFormat('@');
+    p.setColumnWidths(1, 7, 170);
+  }
+  SpreadsheetApp.getUi().alert('Listo. Completá la pestaña PAGOS (titular, CUIT/CUIL, banco, CBU y alias de cada cuenta) y cargá la Condición IVA de cada cliente en la columna K de REGISTROS.');
+}
+
+function pagoDe_(mail) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sh = ss.getSheetByName(HOJA), p = ss.getSheetByName('PAGOS');
+  var n = sh.getLastRow() - 1;
+  if (n < 1 || !p || p.getLastRow() < 2) return { ok: true };
+  var v = sh.getRange(2, 6, n, 6).getValues();            // columnas F..K
+  var cond = '';
+  for (var i = 0; i < v.length; i++) { if (String(v[i][0]).toLowerCase().trim() === mail) { cond = String(v[i][5] || '').trim(); break; } }
+  if (!cond) return { ok: true };
+  var t = p.getRange(2, 1, p.getLastRow() - 1, 7).getValues();
+  for (var k = 0; k < t.length; k++) {
+    if (String(t[k][0]).trim() !== cond) continue;
+    var cbu = String(t[k][4]).replace(/\D/g, '');
+    if (!t[k][1] || !t[k][2] || !t[k][3] || cbu.length !== 22) return { ok: true };   // fila incompleta o CBU inválido
+    return { ok: true, condicion: cond, titular: String(t[k][1]).trim(), cuit: String(t[k][2]).trim(), banco: String(t[k][3]).trim(), cbu: cbu, alias: String(t[k][5] || '').trim(), factura: String(t[k][6]).trim().toUpperCase() === 'A' ? 'A' : 'C' };
+  }
+  return { ok: true };
+}
