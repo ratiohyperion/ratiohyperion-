@@ -23,7 +23,11 @@ function render(){var L=list(),it=$('gitems');it.innerHTML='';$('gcount').textCo
 var LS='rhg_cart';
 function save(){try{var o={};Object.keys(cart).forEach(function(k){o[k]=cart[k].q});localStorage.setItem(LS,JSON.stringify(o))}catch(e){}}
 function restore(){try{var o=JSON.parse(localStorage.getItem(LS)||'{}'),by={};S.items.forEach(function(p){by[p.c]=p});Object.keys(o).forEach(function(k){var q=Math.floor(o[k]);if(by[k]&&q>0&&by[k].e!=='sin_stock')cart[k]={p:by[k],q:q}})}catch(e){}}
-function reset(){S.gen=false;S.num=null;$('gmsg').textContent='';$('gmsg').className='dr-msg'}
+var LG='rhg_gen';
+function sig(){return Object.keys(cart).sort().map(function(k){return k+':'+cart[k].q}).join('|')}
+function saveGen(){try{localStorage.setItem(LG,JSON.stringify({s:sig(),n:S.num,t:Date.now()}))}catch(e){}}
+function restoreGen(){try{var g=JSON.parse(localStorage.getItem(LG)||'null');if(g&&g.s&&g.s===sig()&&Date.now()-g.t<864e5){S.gen=true;S.num=g.n||null;if(S.num){$('gmsg').className='dr-msg ok';$('gmsg').textContent='Cotización N° '+S.num+' generada. Te la enviamos por mail (revisá spam). Ahora enviá el pedido por WhatsApp.'}}}catch(e){}}
+function reset(){S.gen=false;S.num=null;$('gmsg').textContent='';$('gmsg').className='dr-msg';try{localStorage.removeItem(LG)}catch(e){}}
 function set(p,n){reset();var c=cart[p.c]||{p:p,q:0};c.p=p;c.q=Math.max(0,c.q+n);if(c.q)cart[p.c]=c;else delete cart[p.c];save();render()}
 function total(){var t=0,all=true;Object.keys(cart).forEach(function(k){var c=cart[k];if(c.p.p!=null)t+=c.p.p*c.q;else all=false});var dm=Math.round(t*(S.desc||0));return{t:t,all:all,d:S.desc||0,dm:dm,n:t-dm}}
 function pct(d){return (Math.round(d*1000)/10).toString().replace('.',',')+'%'}
@@ -38,9 +42,9 @@ function ok(){var bad=[];['g1','g3','g4'].forEach(function(i){var e=$(i),b=!e.va
 var enviando=false;
 $('gcot').onclick=function(){if(enviando||!ok())return;enviando=true;var btn=$('gcot'),old=btn.textContent;btn.disabled=true;btn.textContent='Generando cotización…';$('gwa').disabled=true;
  post('/api/pedido',{items:Object.keys(cart).map(function(k){return{cod:k,qty:cart[k].q}})}).then(function(d){
-  S.gen=true;S.num=(d&&d.numero)||null;$('gmsg').className='dr-msg'+(S.num?' ok':'');
+  S.gen=true;S.num=(d&&d.numero)||null;saveGen();$('gmsg').className='dr-msg'+(S.num?' ok':'');
   $('gmsg').textContent=S.num?'Cotización N° '+S.num+' generada. Te la enviamos por mail (revisá spam). Ahora enviá el pedido por WhatsApp.':(d&&d.aviso==='limite'?'Alcanzaste el máximo de cotizaciones automáticas de hoy. Igual podés enviar tu pedido por WhatsApp.':'No pudimos generar el número de cotización ahora. Igual podés enviar tu pedido por WhatsApp.');
- },function(){S.gen=true;S.num=null;$('gmsg').textContent='No pudimos generar la cotización. Igual podés enviar tu pedido por WhatsApp.'}).then(function(){enviando=false;btn.textContent=old;draw()})};
+ },function(){S.gen=true;S.num=null;saveGen();$('gmsg').textContent='No pudimos generar la cotización. Igual podés enviar tu pedido por WhatsApp.'}).then(function(){enviando=false;btn.textContent=old;draw()})};
 $('gwa').onclick=function(){if(!S.gen||!ok())return;window.open('https://wa.me/'+W+'?text='+encodeURIComponent(txt(S.num)),'_blank')};
 var gvac=$('gvaciar');if(gvac)gvac.onclick=function(){if(Object.keys(cart).length&&confirm('¿Vaciar el carrito?')){cart={};save();reset();render()}};
 $('awa').onclick=function(){var g=function(i){return $(i).value.trim()},bad=false;['a1','a3','a4'].forEach(function(i){var e=$(i),b=!g(i);e.classList.toggle('err',b);if(b)bad=true});$('amsg').textContent=bad?'Completá nombre, CUIT y WhatsApp.':'';if(bad)return;window.open('https://wa.me/'+W+'?text='+encodeURIComponent('Hola, soy '+g('a1')+(g('a2')?' ('+g('a2')+')':'')+'. CUIT '+g('a3')+'. Quiero solicitar acceso al sitio del gremio. Mi WhatsApp: '+g('a4')),'_blank')};
@@ -72,7 +76,7 @@ function who(){fetch('/api/me').then(function(r){return r.ok?r.json():null}).the
  if(ok)history.replaceState(null,'','/');
  [['g1',u.nombre],['g2',u.empresa],['g3',u.cuit],['g4',u.whatsapp]].forEach(function(p){var e=$(p[0]);if(e&&!e.value&&p[1])e.value=p[1]});
  fetch('/api/descuento').then(function(r){return r.ok?r.json():null}).then(function(x){if(x&&x.descuento>0){S.desc=x.descuento;draw()}}).catch(function(){})}).catch(function(){})}
-function load(){fetch('/api/catalogo').then(function(r){if(r.status===401){showAuth();return}return r.json().then(function(d){if(d.error)throw new Error(d.error);S.items=d.items;S.minimo=d.minimo;$('gupd').textContent=d.actualizado?'Lista actualizada: '+d.actualizado:'';cats();restore();render();who()})}).catch(function(){$('gitems').innerHTML='';$('gitems').appendChild(el('p','empty','No pudimos cargar la lista en este momento. Escribinos por WhatsApp.'))})}
+function load(){fetch('/api/catalogo').then(function(r){if(r.status===401){showAuth();return}return r.json().then(function(d){if(d.error)throw new Error(d.error);S.items=d.items;S.minimo=d.minimo;$('gupd').textContent=d.actualizado?'Lista actualizada: '+d.actualizado:'';cats();restore();restoreGen();render();who()})}).catch(function(){$('gitems').innerHTML='';$('gitems').appendChild(el('p','empty','No pudimos cargar la lista en este momento. Escribinos por WhatsApp.'))})}
 var gb=$('gbar'),ct=document.querySelector('.gr-cart');
 if(gb&&ct){gb.onclick=function(){ct.scrollIntoView({behavior:'smooth',block:'start'})};
  if(typeof window.IntersectionObserver==='function'){new IntersectionObserver(function(en){document.body.classList.toggle('cart-below',!en[0].isIntersecting)},{threshold:0.05}).observe(ct)}else{document.body.classList.add('cart-below')}}

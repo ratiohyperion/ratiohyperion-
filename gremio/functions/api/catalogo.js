@@ -63,7 +63,12 @@ async function load(id) {
     if (txt.trimStart().startsWith('<')) throw new Error('la hoja no es accesible con el enlace');
     return parse(t, csv(txt), meta);
   }));
-  return { minimo: meta.minimo || 0, actualizado: meta.actualizado || null, items: parts.flat() };
+  // Un código repetido en la lista (ej. promo + sección normal + Liq/Outlet) puede traer precios distintos.
+  // El cotizador toma SIEMPRE la primera aparición (en este mismo orden de hojas), así que acá se muestra
+  // solo esa: lo que ve el cliente es lo que se cotiza. Misma normalización de código que el cotizador.
+  const vistos = new Set();
+  const items = parts.flat().filter((i) => { const k = String(i.c).toUpperCase().replace(/\s+/g, ''); if (vistos.has(k)) return false; vistos.add(k); return true; });
+  return { minimo: meta.minimo || 0, actualizado: meta.actualizado || null, items };
 }
 
 // Catálogo con cache de 10 min, para usar también desde otras funciones (ej. /api/pedido).
