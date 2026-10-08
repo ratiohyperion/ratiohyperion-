@@ -81,12 +81,14 @@ export async function onRequestPost({ request, env, waitUntil }) {
         method: 'POST', headers: { 'content-type': 'application/json' }, redirect: 'follow', signal: ctrl.signal,
         body: JSON.stringify({ secret: env.COTIZADOR_SECRET, pedido, devolverPdf: true }),
       });
-      const d = await r.json().catch(() => ({}));
+      const raw = await r.text().catch(() => '');
       clearTimeout(to);
+      let d = {};
+      try { d = JSON.parse(raw); } catch (e) { d = { _raw: raw.slice(0, 300), _status: r.status }; } // respuesta no JSON: se informa en el aviso
 
       if (!d.ok) {
         if (d.error === 'limite diario') { waitUntil(avisoInterno(env, 'Cliente alcanzó el límite diario de cotizaciones automáticas.', u)); return json({ ok: true, numero: null, aviso: 'limite' }); }
-        waitUntil(avisoInterno(env, 'El cotizador devolvió un error: ' + (d.error || 'desconocido') + '.', u));
+        waitUntil(avisoInterno(env, 'El cotizador devolvió un error: ' + (d.error || 'desconocido') + (d._raw !== undefined ? ' [HTTP ' + d._status + ', respuesta no JSON: ' + esc(d._raw) + ']' : '') + '.', u));
         return json({ ok: true, numero: null });
       }
 
