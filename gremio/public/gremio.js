@@ -1,5 +1,5 @@
 (function(){
-var W='5491158862827',S={items:[],minimo:0,act:'',q:'',cat:'',n:60,desc:0},cart={};
+var W='5491158862827',S={items:[],minimo:0,act:'',q:'',cat:'',n:20,desc:0,gen:false,num:null},cart={};
 function $(i){return document.getElementById(i)}
 function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
 function money(n){return '$ '+Math.round(n).toLocaleString('es-AR')}
@@ -14,34 +14,37 @@ function render(){var L=list(),it=$('gitems');it.innerHTML='';$('gcount').textCo
   if(p.e==='sin_stock'){side.appendChild(el('span','gr-tag off','Sin stock'))}
   else{
    if(p.p!=null){var pr=el('div','gr-price',money(p.p));pr.appendChild(el('small',null,' + IVA'));side.appendChild(pr)}else if(p.e==='consultar'){side.appendChild(el('span','gr-tag','Consultar precio'))}else{side.appendChild(el('span','gr-tag','Consultar precio'))}
-   var q=el('div','gr-q'),m=el('button',null,'−'),n=el('span',null,String(cart[p.c]?cart[p.c].q:0)),pl=el('button',null,'+');m.setAttribute('aria-label','Menos');pl.setAttribute('aria-label','Más');m.onclick=function(){set(p,-1)};pl.onclick=function(){set(p,1)};q.appendChild(m);q.appendChild(n);q.appendChild(pl);side.appendChild(q)}
+   var cq=cart[p.c]?cart[p.c].q:0;
+   if(!cq){var ad=el('button','btn btn-blue gr-add','Agregar');ad.type='button';ad.onclick=function(){set(p,1)};side.appendChild(ad)}
+   else{var q=el('div','gr-q'),m=el('button',null,'−'),n=el('span',null,String(cq)),pl=el('button',null,'+');m.type=pl.type='button';m.setAttribute('aria-label','Menos');pl.setAttribute('aria-label','Más');m.onclick=function(){set(p,-1)};pl.onclick=function(){set(p,1)};q.appendChild(m);q.appendChild(n);q.appendChild(pl);side.appendChild(q)}}
   d.appendChild(side);it.appendChild(d)});
  if(!L.length)it.appendChild(el('p','empty','No encontramos productos con ese filtro.'));
- $('gmore').hidden=L.length<=S.n;draw()}
-function set(p,n){var c=cart[p.c]||{p:p,q:0};c.p=p;c.q=Math.max(0,c.q+n);if(c.q)cart[p.c]=c;else delete cart[p.c];render()}
+ var gm=$('gmore');gm.hidden=L.length<=S.n;gm.textContent='Ver más ('+Math.min(20,L.length-S.n)+' de '+(L.length-S.n)+' restantes)';draw()}
+function reset(){S.gen=false;S.num=null;$('gmsg').textContent=''}
+function set(p,n){reset();var c=cart[p.c]||{p:p,q:0};c.p=p;c.q=Math.max(0,c.q+n);if(c.q)cart[p.c]=c;else delete cart[p.c];render()}
 function total(){var t=0,all=true;Object.keys(cart).forEach(function(k){var c=cart[k];if(c.p.p!=null)t+=c.p.p*c.q;else all=false});var dm=Math.round(t*(S.desc||0));return{t:t,all:all,d:S.desc||0,dm:dm,n:t-dm}}
 function pct(d){return (Math.round(d*1000)/10).toString().replace('.',',')+'%'}
 function draw(){var ul=$('gcart'),ks=Object.keys(cart);ul.innerHTML='';if(!ks.length)ul.appendChild(el('li','empty','Todavía no agregaste productos.'));
  ks.forEach(function(k){var c=cart[k],li=el('li');li.appendChild(el('span',null,c.q+' × '+c.p.c));if(c.p.p!=null)li.appendChild(el('span',null,money(c.p.p*c.q)));var lq=el('span','gr-lq'),mm=el('button',null,'−'),pp=el('button',null,'+');mm.type=pp.type='button';mm.setAttribute('aria-label','Menos');pp.setAttribute('aria-label','Más');mm.onclick=function(){set(c.p,-1)};pp.onclick=function(){set(c.p,1)};lq.appendChild(mm);lq.appendChild(pp);li.appendChild(lq);ul.appendChild(li)});
  var B=$('gbar');if(B){var u=0;ks.forEach(function(k){u+=cart[k].q});B.innerHTML='';B.hidden=!ks.length;if(ks.length){B.appendChild(el('span',null,'Ver pedido ('+u+')'));B.appendChild(el('b',null,money(total().n)))}}
  var T=$('gtotal');T.innerHTML='';var bajoMinimo=false;if(ks.length){var r=total(),l=el('div','l');if(r.d>0&&r.all){var l1=el('div','l');l1.appendChild(el('span',null,'Subtotal sin IVA'));l1.appendChild(el('span',null,money(r.t)));T.appendChild(l1);var l2=el('div','l');l2.appendChild(el('span',null,'Descuento '+pct(r.d)));l2.appendChild(el('span',null,'− '+money(r.dm)));T.appendChild(l2)}l.appendChild(el('span',null,'Total sin IVA'));l.appendChild(el('span','t',money(r.d>0&&r.all?r.n:r.t)));T.appendChild(l);if(!r.all)T.appendChild(el('div','warn','Algunos ítems no tienen precio: se cotizan aparte.'));else if(S.minimo&&r.t<S.minimo){bajoMinimo=true;T.appendChild(el('div','warn','Compra mínima '+money(S.minimo)+' + IVA. Faltan '+money(S.minimo-r.t)+'.'))}}
- $('gwa').disabled=bajoMinimo;}
+ $('gcot').disabled=bajoMinimo||!ks.length;$('gwa').disabled=!S.gen||!ks.length;}
 function txt(numero){var g=function(i){return $(i).value.trim()},r=total(),lines=Object.keys(cart).map(function(k){var c=cart[k];return '• '+c.q+' × '+(c.p.m?'['+c.p.m+'] ':'')+c.p.c+' — '+c.p.d.slice(0,70)+(c.p.p!=null?' ('+money(c.p.p)+' c/u)':'')});
  return 'Pedido de gremio'+(numero?'\nCotización N° '+numero:'')+'\nNombre: '+g('g1')+(g('g2')?'\nEmpresa: '+g('g2'):'')+'\nCUIT: '+g('g3')+'\nWhatsApp: '+g('g4')+'\n\nProductos:\n'+lines.join('\n')+(r.t?(r.d>0&&r.all?'\n\nSubtotal sin IVA: '+money(r.t)+'\nDescuento gremio ('+pct(r.d)+'): − '+money(r.dm)+'\nTotal estimado sin IVA: '+money(r.n):'\n\nTotal estimado sin IVA: '+money(r.t)):'')+(g('g5')?'\n\nComentarios: '+g('g5'):'')}
 function ok(){var bad=[];['g1','g3','g4'].forEach(function(i){var e=$(i),b=!e.value.trim();e.classList.toggle('err',b);if(b)bad.push(i)});var m='';if(!Object.keys(cart).length)m='Agregá al menos un producto. ';if(bad.length)m+='Completá nombre, CUIT y WhatsApp.';$('gmsg').textContent=m;return !m}
 var enviando=false;
-$('gwa').onclick=function(){if(enviando||!ok())return;enviando=true;var btn=$('gwa'),win=window.open('','_blank'),old=btn.textContent;btn.disabled=true;btn.textContent='Generando cotización…';
+$('gcot').onclick=function(){if(enviando||!ok())return;enviando=true;var btn=$('gcot'),old=btn.textContent;btn.disabled=true;btn.textContent='Generando cotización…';$('gwa').disabled=true;
  post('/api/pedido',{items:Object.keys(cart).map(function(k){return{cod:k,qty:cart[k].q}})}).then(function(d){
-  if(d&&d.aviso==='limite')$('gmsg').textContent='Alcanzaste el máximo de cotizaciones automáticas de hoy; tu pedido igual fue enviado.';
-  var url='https://wa.me/'+W+'?text='+encodeURIComponent(txt(d&&d.numero));
-  if(win)win.location=url;else window.open(url,'_blank');
- },function(){var url='https://wa.me/'+W+'?text='+encodeURIComponent(txt());if(win)win.location=url;else window.open(url,'_blank')}).then(function(){enviando=false;btn.disabled=false;btn.textContent=old})};
-var gvac=$('gvaciar');if(gvac)gvac.onclick=function(){if(Object.keys(cart).length&&confirm('¿Vaciar el carrito?')){cart={};render()}};
+  S.gen=true;S.num=(d&&d.numero)||null;
+  $('gmsg').textContent=S.num?'Cotización N° '+S.num+' generada. Te la enviamos por mail (revisá spam). Ahora enviá el pedido por WhatsApp.':(d&&d.aviso==='limite'?'Alcanzaste el máximo de cotizaciones automáticas de hoy. Igual podés enviar tu pedido por WhatsApp.':'No pudimos generar el número de cotización ahora. Igual podés enviar tu pedido por WhatsApp.');
+ },function(){S.gen=true;S.num=null;$('gmsg').textContent='No pudimos generar la cotización. Igual podés enviar tu pedido por WhatsApp.'}).then(function(){enviando=false;btn.textContent=old;draw()})};
+$('gwa').onclick=function(){if(!S.gen||!ok())return;window.open('https://wa.me/'+W+'?text='+encodeURIComponent(txt(S.num)),'_blank')};
+var gvac=$('gvaciar');if(gvac)gvac.onclick=function(){if(Object.keys(cart).length&&confirm('¿Vaciar el carrito?')){cart={};reset();render()}};
 $('awa').onclick=function(){var g=function(i){return $(i).value.trim()},bad=false;['a1','a3','a4'].forEach(function(i){var e=$(i),b=!g(i);e.classList.toggle('err',b);if(b)bad=true});$('amsg').textContent=bad?'Completá nombre, CUIT y WhatsApp.':'';if(bad)return;window.open('https://wa.me/'+W+'?text='+encodeURIComponent('Hola, soy '+g('a1')+(g('a2')?' ('+g('a2')+')':'')+'. CUIT '+g('a3')+'. Quiero solicitar acceso al sitio del gremio. Mi WhatsApp: '+g('a4')),'_blank')};
 document.addEventListener('input',function(e){if(e.target.classList&&e.target.classList.contains('err')&&e.target.value.trim())e.target.classList.remove('err')});
-var tm;$('gq').oninput=function(){clearTimeout(tm);var v=this.value;tm=setTimeout(function(){S.q=v;S.n=60;render()},150)};
-$('gcat').onchange=function(){S.cat=this.value;S.n=60;render()};
-$('gmore').onclick=function(){S.n+=60;render()};
+var tm;$('gq').oninput=function(){clearTimeout(tm);var v=this.value;tm=setTimeout(function(){S.q=v;S.n=20;render()},150)};
+$('gcat').onchange=function(){S.cat=this.value;S.n=20;render()};
+$('gmore').onclick=function(){S.n+=20;render()};
 function post(u,b){return fetch(u,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(b||{})}).then(function(r){return r.json().catch(function(){return{}}).then(function(d){d._s=r.status;return d})})}
 function show(id){['axlogin','axreg','axforg','axreset'].forEach(function(f){$(f).hidden=f!==id});$('axt1').classList.toggle('on',id==='axlogin'||id==='axforg'||id==='axreset');$('axt2').classList.toggle('on',id==='axreg')}
 function note(t,bad){var n=$('axnote');n.hidden=!t;n.textContent=t||'';n.className='gr-axnote'+(bad?' bad':'')}
