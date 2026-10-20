@@ -2,10 +2,14 @@
 // y la devuelve como JSON. Cache de 10 min. Variable opcional: SHEET_ID.
 import { json as _j, currentUser } from '../_lib.js';
 const SHEET_ID = '16pnoHtlqJZe-z3TKIid5_30AWFDBLbU5cs_kswoKt90';
-const TABS = ['Hikvision Cctv-IP', 'Hik Alarma/Portero/Acceso', 'DAHUA', 'EZVIZ', 'IMOU', 'Tp-Link', 'Intelbras', 'Accesorios / Varios', 'Commax', 'Celulares', 'Liq/Outlet'];
+const TABS = ['Hikvision Cctv-IP', 'Hik Alarma/Portero/Acceso', 'DAHUA promo', 'EZVIZ', 'IMOU promo', 'Tp-Link', 'Intelbras', 'Accesorios / Varios', 'Commax', 'Celulares', 'Liq/Outlet',
+  'DAHUA', 'IMOU', 'Dahua Alarmas', 'SudVision', 'ABB', 'Huawei', 'Reyee Ruijie', 'H3C', 'Fiberhome', 'DCA', 'Panel Solar', 'Imodo', 'Ugreen', 'Hisense', 'Multimarca'];
+// Pestañas del segundo proveedor y las "promo": si alguna no se puede leer, se omite sin romper el resto del catálogo.
+const OPCIONALES = new Set(['DAHUA promo', 'IMOU promo', 'DAHUA', 'IMOU', 'Dahua Alarmas', 'SudVision', 'ABB', 'Huawei', 'Reyee Ruijie', 'H3C', 'Fiberhome', 'DCA', 'Panel Solar', 'Imodo', 'Ugreen', 'Hisense', 'Multimarca']);
 let memo = { t: 0, d: null };
-const TAB_MARCA = { 'Hikvision Cctv-IP': 'Hikvision', 'Hik Alarma/Portero/Acceso': 'Hikvision', DAHUA: 'Dahua', EZVIZ: 'Ezviz', IMOU: 'Imou', 'Tp-Link': 'TP-Link', Intelbras: 'Intelbras', Commax: 'Commax' };
-const MARCAS = ['HIKVISION', 'HILOOK', 'DAHUA', 'UNIVIEW', 'ANVIZ', 'IMODO', 'FICATTO', 'SINOVISION', 'FURUKAWA', 'NETQUALITY', 'GLC', 'COMMSCOPE', 'FULLVISION', 'EZVIZ', 'IMOU', 'TP-LINK', 'TAPO', 'MERCUSYS', 'REYEE', 'INTELBRAS', 'COMMAX', 'SAMSUNG', 'XIAOMI', 'MOTOROLA', 'KINGSTON', 'SEAGATE', 'WESTERN DIGITAL', 'LENOVO', 'APPLE'];
+const TAB_MARCA = { 'Hikvision Cctv-IP': 'Hikvision', 'Hik Alarma/Portero/Acceso': 'Hikvision', DAHUA: 'Dahua', 'DAHUA promo': 'Dahua', 'Dahua Alarmas': 'Dahua', EZVIZ: 'Ezviz', IMOU: 'Imou', 'IMOU promo': 'Imou', 'Tp-Link': 'TP-Link', Intelbras: 'Intelbras', Commax: 'Commax',
+  SudVision: 'SudVision', ABB: 'ABB', Huawei: 'Huawei', 'Reyee Ruijie': 'Reyee', H3C: 'H3C', Fiberhome: 'Fiberhome', DCA: 'DCA', Imodo: 'Imodo', Ugreen: 'Ugreen', Hisense: 'Hisense' };
+const MARCAS = ['HIKVISION', 'HILOOK', 'DAHUA', 'UNIVIEW', 'ANVIZ', 'IMODO', 'FICATTO', 'SINOVISION', 'FURUKAWA', 'NETQUALITY', 'GLC', 'COMMSCOPE', 'FULLVISION', 'EZVIZ', 'IMOU', 'TP-LINK', 'TAPO', 'MERCUSYS', 'REYEE', 'INTELBRAS', 'COMMAX', 'SAMSUNG', 'XIAOMI', 'MOTOROLA', 'KINGSTON', 'SEAGATE', 'WESTERN DIGITAL', 'LENOVO', 'APPLE', 'PHILIPS'];
 const bonita = (m) => (m === 'TP-LINK' ? 'TP-Link' : m.charAt(0) + m.slice(1).toLowerCase());
 function marca(cat, g, c, d) {
   const t = (c + ' ' + d).toUpperCase();
@@ -57,11 +61,16 @@ async function load(id) {
     if (m0) meta.actualizado = m0[1] + ' ' + m0[2] + ' hs';
   } catch (e) { /* la fecha es opcional */ }
   const parts = await Promise.all(TABS.map(async (t) => {
-    const r = await fetch(`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&headers=0&sheet=${encodeURIComponent(t)}`);
-    if (!r.ok) throw new Error('hoja ' + t + ' ' + r.status);
-    const txt = await r.text();
-    if (txt.trimStart().startsWith('<')) throw new Error('la hoja no es accesible con el enlace');
-    return parse(t, csv(txt), meta);
+    try {
+      const r = await fetch(`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&headers=0&sheet=${encodeURIComponent(t)}`);
+      if (!r.ok) throw new Error('hoja ' + t + ' ' + r.status);
+      const txt = await r.text();
+      if (txt.trimStart().startsWith('<')) throw new Error('la hoja no es accesible con el enlace');
+      return parse(t, csv(txt), meta);
+    } catch (e) {
+      if (OPCIONALES.has(t)) { console.log('[catalogo] pestaña omitida', t, String(e)); return []; }
+      throw e;
+    }
   }));
   // Cada ítem se identifica por HOJA + CÓDIGO + DESCRIPCIÓN (clave `k`), no por la posición de la fila:
   // el mismo código puede estar en la hoja de la marca y en Liq/Outlet (cada uno con su precio), y dentro
