@@ -87,3 +87,5 @@ body.cart-below .gr-bar b{font-size:17px}
 .gr-ax[hidden],.gr-ax [hidden],.gr-userbar[hidden],#ggrid[hidden],.gr-upd[hidden]{display:none!important}
 
 .dr-msg.ok{color:#1b7a43;font-weight:600}
+
+.gr-sort{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 10px;font-size:13px}.gr-sort span{color:#5b6b82;font-weight:600}.gr-sort button{font:inherit;padding:6px 12px;border:1px solid #b9d0ee;border-radius:999px;background:#fff;color:var(--ink,#0b0b0f);cursor:pointer}.gr-sort button.on{background:var(--blue);border-color:var(--blue);color:#fff}

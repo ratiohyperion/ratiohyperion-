@@ -1,5 +1,5 @@
 (function(){
-var W='5491158862827',S={items:[],minimo:0,act:'',q:'',cat:'',n:20,desc:0,gen:false,num:null},cart={};
+var W='5491158862827',S={items:[],minimo:0,act:'',q:'',cat:'',ord:'',n:20,desc:0,gen:false,num:null},cart={};
 function $(i){return document.getElementById(i)}
 function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
 function money(n){return '$ '+Math.round(n).toLocaleString('es-AR')}
@@ -8,7 +8,8 @@ var bg=document.querySelector('.burger'),nv=document.querySelector('.nav');if(bg
 
 function cats(){var s=$('gcat'),m={};S.items.forEach(function(i){m[i.cat]=(m[i.cat]||0)+1});s.innerHTML='';var o=el('option',null,'Todas las categorías ('+S.items.length+')');o.value='';s.appendChild(o);Object.keys(m).forEach(function(k){var o=el('option',null,k+' ('+m[k]+')');o.value=k;s.appendChild(o)});s.value=S.cat}
 function list(){var q=norm(S.q).split(/\s+/).filter(Boolean);return S.items.filter(function(i){if(S.cat&&i.cat!==S.cat)return false;if(!q.length)return true;var h=norm(i.c+' '+i.d+' '+i.g+' '+i.cat+' '+(i.m||''));return q.every(function(t){return h.indexOf(t)>-1})})}
-function render(){var L=list(),it=$('gitems');it.innerHTML='';$('gcount').textContent=L.length+' producto'+(L.length===1?'':'s');
+function ordenar(L){var o=S.ord;if(!o)return L;var A=L.map(function(p,i){return{p:p,i:i}}),pr=function(p){return p.p!=null&&p.e!=='sin_stock'},st=function(p){return p.e==='sin_stock'?1:0};A.sort(function(a,b){var x=a.p,y=b.p,r=0;if(o==='min'||o==='max'){var px=pr(x),py=pr(y);if(px!==py)return px?-1:1;if(px)r=o==='min'?x.p-y.p:y.p-x.p}else if(o==='stock'){r=st(x)-st(y)}else if(o==='az'){r=norm(x.d).localeCompare(norm(y.d))}return r||a.i-b.i});return A.map(function(a){return a.p})}
+function render(){var L=ordenar(list()),it=$('gitems');it.innerHTML='';$('gcount').textContent=L.length+' producto'+(L.length===1?'':'s');
  L.slice(0,S.n).forEach(function(p){var d=el('div','gr-it'),info=el('div','info');info.appendChild(el('b',null,p.c));if(p.m||p.g)info.appendChild(el('em',null,' · '+[p.m,p.g].filter(Boolean).join(' · ')));info.appendChild(el('small',null,p.d));d.appendChild(info);
   var side=el('div','side');
   if(p.e==='sin_stock'){side.appendChild(el('span','gr-tag off','Sin stock'))}
@@ -51,6 +52,7 @@ var gvac=$('gvaciar');if(gvac)gvac.onclick=function(){if(Object.keys(cart).lengt
 $('awa').onclick=function(){var g=function(i){return $(i).value.trim()},bad=false;['a1','a3','a4'].forEach(function(i){var e=$(i),b=!g(i);e.classList.toggle('err',b);if(b)bad=true});$('amsg').textContent=bad?'Completá nombre, CUIT y WhatsApp.':'';if(bad)return;window.open('https://wa.me/'+W+'?text='+encodeURIComponent('Hola, soy '+g('a1')+(g('a2')?' ('+g('a2')+')':'')+'. CUIT '+g('a3')+'. Quiero solicitar acceso al sitio del gremio. Mi WhatsApp: '+g('a4')),'_blank')};
 document.addEventListener('input',function(e){if(e.target.classList&&e.target.classList.contains('err')&&e.target.value.trim())e.target.classList.remove('err')});
 var tm;$('gq').oninput=function(){clearTimeout(tm);var v=this.value;tm=setTimeout(function(){S.q=v;S.n=20;render()},150)};
+var gs=$('gsort');if(gs)gs.onclick=function(e){var b=e.target.closest?e.target.closest('button[data-o]'):null;if(!b)return;S.ord=S.ord===b.getAttribute('data-o')?'':b.getAttribute('data-o');[].forEach.call(gs.querySelectorAll('button'),function(x){var on=x.getAttribute('data-o')===S.ord;x.classList.toggle('on',on);x.setAttribute('aria-pressed',on?'true':'false')});S.n=20;render()};
 $('gcat').onchange=function(){S.cat=this.value;S.n=20;render()};
 $('gmore').onclick=function(){S.n+=20;render()};
 function post(u,b){return fetch(u,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(b||{})}).then(function(r){return r.json().catch(function(){return{}}).then(function(d){d._s=r.status;return d})})}
